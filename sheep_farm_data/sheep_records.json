@@ -1,0 +1,35 @@
+{
+  "WP001": {
+    "id": "WP001",
+    "animal_type": "แพะ",
+    "tag_color": "-",
+    "gender": "ตัวผู้",
+    "dob": "",
+    "breed": "กองบิน 23",
+    "weight": "",
+    "status": "ปกติ",
+    "registered_date": "2026-09-11"
+  },
+  "WP002": {
+    "id": "WP002",
+    "animal_type": "แพะ",
+    "tag_color": "-",
+    "gender": "ตัวเมีย",
+    "dob": "",
+    "breed": "กองบิน 23",
+    "weight": "",
+    "status": "ปกติ",
+    "registered_date": "2026-09-11"
+  },
+  "WG001": {
+    "id": "WG001",
+    "animal_type": "แกะ",
+    "tag_color": "สีเหลือง",
+    "gender": "ตัวเมีย",
+    "dob": "",
+    "breed": "",
+    "weight": "",
+    "status": "ปกติ",
+    "registered_date": "2026-09-11"
+  }
+}

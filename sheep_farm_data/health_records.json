@@ -1,0 +1,11 @@
+{
+  "WG001": [
+    {
+      "date": "2026-09-14",
+      "type": "วัคซีน",
+      "vaccine_name": "ไบคอน",
+      "injection_number": "1",
+      "next_dose_date": "2026-10-14"
+    }
+  ]
+}

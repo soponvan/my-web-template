@@ -1,0 +1,26 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "scrypt:32768:8:1$BfHg9wBztwrW6l32$789921c511a2906a026d9754193b365b07f350d127b142b9837032220d9df62a3029355f06a7dbf59bdd5a377cfc032ced3d239fbf0440ac7887ec7a9eec02c7",
+    "role": "admin",
+    "display_name": "ผู้ดูแลระบบ",
+    "created_at": "2026-03-27 10:02:17",
+    "active": true
+  },
+  "sopon_van": {
+    "username": "sopon_van",
+    "password": "scrypt:32768:8:1$ZhwSEJosAgCSFEgn$27adaa81aabd31f0a506f38a08547d65d1c80ef3dcd69e53c69c60a21b160f2faa352e4862d1b64b9799812c17d7081e7917797db7102849cf7558268e6734f9",
+    "role": "admin",
+    "display_name": "Sopon Vandee",
+    "created_at": "2026-03-27 10:19:32",
+    "active": true
+  },
+  "wing23": {
+    "username": "wing23",
+    "password": "pbkdf2:sha256:600000$P1z5x1Veocnd5v9T$de474daf736a45bfb56030f11f81c700f72cf5fef197aa2b34b38bfd73f390d8",
+    "role": "user",
+    "display_name": "จนท.ลงทะเบียน",
+    "created_at": "2026-09-11 17:37:45",
+    "active": true
+  }
+}

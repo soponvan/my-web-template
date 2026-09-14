@@ -1,0 +1,2869 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐑 ระบบบริหารจัดการฟาร์มแกะ กองบิน 23</title>
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@100;200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Use Sarabun for Thai and latin scripts */
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #0d1a10 0%, #162a1c 50%, #1a2e21 100%);
+            background-size: 400% 400%;
+            animation: backgroundPulse 15s ease infinite;
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #FDD771;
+        }
+
+        @keyframes backgroundPulse {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Custom Premium Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #10b981, #059669);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #34d399;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header {
+            /* Premium Emerald / Forest Green gradient */
+            background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.6);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.15em;
+            color: #FDD771;
+            opacity: 0.9;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .wing-logo {
+            position: absolute;
+            top: 25px;
+            right: 40px;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .wing-logo:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .wing-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+            transition: filter 0.4s ease;
+        }
+
+        .wing-logo:hover img {
+            filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: transparent;
+            padding: 10px 20px 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            font-weight: 600;
+            color: #e7e5e4;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #FDD771;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2), 0 0 10px rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #FDD771;
+            border-color: transparent;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 20px 40px 40px 40px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            color: #FDD771;
+            margin-bottom: 35px;
+            padding-bottom: 15px;
+            font-size: 2em;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 4px;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section h3 {
+            color: #FDD771;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        @keyframes slideIn {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+
+            to {
+                width: 100%;
+                opacity: 1;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FDD771;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1em;
+            color: #FDD771;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        input:hover,
+        select:hover,
+        textarea:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), inset 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        select option {
+            background-color: #0d1a10;
+            color: #FDD771;
+            padding: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #FDD771;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            font-family: 'Sarabun', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px -4px rgba(16, 185, 129, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease-out, height 0.6s ease-out;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -8px rgba(16, 185, 129, 0.6), 0 0 15px rgba(16, 185, 129, 0.2);
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+
+        button:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 15px -6px rgba(37, 99, 235, 0.5);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 30px -10px rgba(37, 99, 235, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            border-color: #bfdbfe;
+        }
+
+        .card h3 {
+            color: #FDD771;
+            margin-bottom: 15px;
+            font-size: 1.25em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card p {
+            color: #FDD771;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .alert {
+            padding: 18px 24px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            border-left: 5px solid;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+            animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+            border-left-color: #22c55e;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+            border-left-color: #ef4444;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+            padding: 10px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+            color: #FDD771;
+            padding: 35px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 35px -10px rgba(6, 78, 59, 0.5), 0 0 15px rgba(16, 185, 129, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 40px -10px rgba(16, 185, 129, 0.6), 0 0 25px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .stat-card:hover::before {
+            top: -20%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+        }
+
+        .stat-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+        }
+
+        .stat-card h3 {
+            font-size: 3.2em;
+            margin: 10px 0;
+            font-weight: 900;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.6);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Modal Styling */
+        [id$="Modal"] {
+            backdrop-filter: blur(12px);
+            background-color: rgba(15, 23, 42, 0.4) !important;
+            animation: fadeIn 0.3s ease;
+        }
+
+        [id$="Modal"]>div {
+            animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #111827 !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(16, 185, 129, 0.1) !important;
+            padding: 30px !important;
+        }
+
+        [id$="Modal"] h2 {
+            color: #FDD771;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .btn-filter {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .btn-filter:hover {
+            background: #f1f5f9;
+        }
+
+        .btn-filter.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: #2563eb;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            background: transparent;
+            border-radius: 14px;
+            overflow: hidden;
+            font-size: 0.95em;
+        }
+
+        th,
+        td {
+            padding: 18px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FDD771;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr {
+            transition: all 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar.mobile-active {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+                border-right: 1px solid rgba(255, 255, 255, 0.5);
+                padding-top: 60px;
+            }
+
+            .menu-toggle {
+                display: flex !important;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            font-size: 35px;
+            color: white;
+            cursor: pointer;
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+        /* Text and image layout improvements */
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .menu-item {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+            /* Reduce overall font size */
+        body, .content, .sidebar, .menu-item, label, input, select, textarea, p, h1, h2, h3, h4, h5, h6 {
+            font-size: 0.85rem; /* slightly smaller */
+        }
+        /* Image spacing */
+        img {
+            margin-bottom: 8px;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #report-content,
+            #report-content * {
+                visibility: visible;
+            }
+
+            #report-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000;
+                filter: grayscale(100%);
+                -webkit-print-color-adjust: economy;
+                print-color-adjust: economy;
+            }
+
+            #report-content * {
+                color: #000 !important;
+                border-color: #000 !important;
+            }
+
+            #report-content .card,
+            #report-content .stat-card,
+            #report-content table {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            #report-content tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            #report-content thead {
+                display: table-header-group;
+            }
+
+            #report-content h3 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+        }
+                /* Dashboard card size adjustments - smaller card, larger text */
+        .stat-card {
+            padding: 10px 8px;
+            min-height: 138px;
+}
+        .stat-icon {
+            font-size: 2.7em;
+            margin-bottom: 8px;
+        }
+.stat-card h3 {
+    font-size: 2.8em; /* larger heading */
+    margin: 4px 0 6px;
+}
+.stat-card p {
+    font-size: 1.25em; /* larger paragraph */
+}
+
+        #report .stat-card {
+            min-height: 88px;
+            padding: 5px 4px;
+            border-radius: 12px;
+        }
+
+        #report .stat-card h3 {
+            font-size: 1.8em;
+            margin: 1px 0 2px;
+        }
+
+        #report .stat-card p {
+            font-size: 0.85em;
+        }
+
+        #dashboard .stats {
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 10px;
+        }
+
+        #dashboard .stat-card {
+            min-height: 100px;
+            padding: 6px 4px;
+            border-radius: 12px;
+        }
+
+        #dashboard .stat-card .stat-icon {
+            font-size: 2.2em;
+            margin-bottom: 4px;
+        }
+
+        #dashboard .stat-card h3 {
+            font-size: 2.2em;
+            margin: 2px 0 3px;
+        }
+
+        #dashboard .stat-card p {
+            font-size: 0.9em;
+        }
+        </style>
+</head>
+
+<body>
+    <div class="mobile-overlay" onclick="toggleMobileMenu()"></div>
+    <div class="container">
+        <header>
+            <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
+            <div class="wing-logo">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Wing 23 Logo">
+            </div>
+            <h1 style="color: #FDD771; font-size: 1.3rem;">🐑🐐 ระบบบริหารจัดการฟาร์มแกะและแพะ กองบิน 23</h1>
+            <p style="color: #FDD771;">Sheep & Goat Farm Management System - Wing 23</p>
+            <!-- User Info Bar -->
+            <div id="user-info-bar" style="
+                position: absolute; top: 6px; left: 80px;
+                display: flex; align-items: center; gap: 10px;
+                background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 30px; padding: 6px 14px 6px 10px;
+                backdrop-filter: blur(10px);">
+                <span style="font-size: 1.4em;">👤</span>
+                <div style="text-align: left; line-height: 1.3;">
+                    <div id="ui-display-name" style="font-weight: 600; font-size: 0.85em; color: #FDD771;"></div>
+                    <div id="ui-role-badge" style="font-size: 0.7em; color: #FDD771; opacity: 0.8;"></div>
+                </div>
+                <div style="display: flex; gap: 5px; margin-left: 10px;">
+                    <button onclick="openChangePasswordModal()" style="
+                        padding: 4px 10px; font-size: 0.75em;
+                        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+                        color: #FDD771; border-radius: 20px; cursor: pointer;
+                        font-family: inherit; transition: all 0.2s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.2)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                        🔑 เปลี่ยนรหัส
+                    </button>
+                    <button onclick="doLogout()" style="
+                        padding: 4px 12px; font-size: 0.75em;
+                        background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.4);
+                        color: #FDD771; border-radius: 20px; cursor: pointer;
+                        font-family: inherit; transition: all 0.2s;"
+                        onmouseover="this.style.background='rgba(239,68,68,0.45)'"
+                        onmouseout="this.style.background='rgba(239,68,68,0.25)'">
+                        🚪 ออก
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="menu-item active" onclick="showSection('dashboard')">📊 แดชบอร์ด</div>
+                <div class="menu-item" id="menu-sheep" onclick="showSection('sheep')">🐑 จัดการแกะและแพะ</div>
+                <div class="menu-item" onclick="showSection('feeding')">🍽️ การให้อาหาร</div>
+                <div class="menu-item" onclick="showSection('health')">💉 สุขภาพ/วัคซีน</div>
+                <div class="menu-item" onclick="showSection('breeding')">👶 ผสมพันธุ์และการคลอด</div>
+                <div class="menu-item" onclick="showSection('feed-stock')">📦 คลังอาหาร</div>
+                <div id="menu-dead" class="menu-item" onclick="showSection('dead')">⚰️ ทะเบียนสัตว์ตาย/หาย</div>
+                <div class="menu-item" onclick="showSection('report')">📈 รายงาน</div>
+                <div class="menu-item admin-only" id="menu-users" onclick="showSection('users')"
+                    style="display:none; border-top: 1px solid rgba(99,102,241,0.2); margin-top: 8px; padding-top: 12px;">
+                    👥 จัดการผู้ใช้</div>
+            </div>
+            <div class="content">
+                <div id="dashboard" class="section active">
+                    <h2>📊 แดชบอร์ด</h2>
+                    <div id="stats" class="stats"></div>
+                    <div id="alert-area"></div>
+                </div>
+
+                <!-- Sheep & Goat Management -->
+                <div id="sheep" class="section">
+                    <h2 id="livestock-section-title">🐑 จัดการแกะและแพะ</h2>
+                    <div id="sheep-alert"></div>
+
+                    <h3 id="title-register-sheep">📝 ลงทะเบียนสัตว์ใหม่</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>ชนิดสัตว์</label>
+                                <select id="animal_type" onchange="onAnimalTypeChange(this.value)">
+                                    <option value="แกะ">🐑 แกะ</option>
+                                    <option value="แพะ">🐐 แพะ</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label id="label-sheep-id">รหัสสัตว์ (ID)</label>
+                                <input type="text" id="sheep_id" placeholder="เช่น S001 หรือ G001">
+                            </div>
+                            <div class="form-group">
+                                <label>เพศ</label>
+                                <select id="gender">
+                                    <option value="">เลือกเพศ</option>
+                                    <option value="ตัวผู้">ตัวผู้</option>
+                                    <option value="ตัวเมีย">ตัวเมีย</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>วันเกิด (YYYY-MM-DD)</label>
+                                <input type="date" id="dob">
+                            </div>
+                            <div class="form-group">
+                                <label>สายพันธุ์</label>
+                                <input type="text" id="breed" list="breed-suggestions" placeholder="พิมพ์หรือเลือกสายพันธุ์">
+                                <datalist id="breed-suggestions"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <label>น้ำหนัก (กก.)</label>
+                                <input type="number" id="weight" placeholder="เช่น 45.5" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>สีแท็กติดหูแกะ</label>
+                                <select id="tag_color">
+                                    <option value="-">ยังไม่ระบุสี</option>
+                                    <option value="กลมสีเหลือง">แท็กกลมสีเหลือง</option>
+                                    <option value="สีแดง">สีแดง</option>
+                                    <option value="สีฟ้า">สีฟ้า</option>
+                                    <option value="สีน้ำเงิน">สีน้ำเงิน</option>
+                                    <option value="สีเขียว">สีเขียว</option>
+                                    <option value="สีเหลือง">สีเหลือง</option>
+                                    <option value="สีส้ม">สีส้ม</option>
+                                    <option value="สีม่วง">สีม่วง</option>
+                                    <option value="สีชมพู">สีชมพู</option>
+                                    <option value="สีขาว">สีขาว</option>
+                                    <option value="สีดำ">สีดำ</option>
+                                </select>
+                            </div>
+                            <button id="btn-register-sheep" onclick="registerSheep()">บันทึกสัตว์</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">📋 ทะเบียนสัตว์ทั้งหมด</h3>
+                    <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; color: #475569; font-size: 0.9em;">ตัวกรอง:</span>
+                        <button id="filter-all" onclick="setAnimalFilter('ทั้งหมด')" class="btn-filter active">🌟 ทั้งหมด</button>
+                        <button id="filter-sheep" onclick="setAnimalFilter('แกะ')" class="btn-filter">🐑 แกะ</button>
+                        <button id="filter-goat" onclick="setAnimalFilter('แพะ')" class="btn-filter">🐐 แพะ</button>
+                        <button onclick="loadSheepList()" style="margin-left: auto; padding: 6px 14px; font-size: 0.9em;">🔄 รีเฟรช</button>
+                    </div>
+                    <div id="sheep-list" class="table-responsive"></div>
+                    <div class="card" style="margin-top: 24px; overflow-x: auto;">
+                        <h3 style="margin-bottom: 14px;">สรุปจำนวนสัตว์ตามสีแท็กติดหูแกะ</h3>
+                        <div id="animal-tag-summary" class="table-responsive"></div>
+                    </div>
+                </div>
+
+                <!-- Edit Animal Modal -->
+                <div id="editModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+                        <span onclick="closeEditModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>แก้ไขข้อมูลสัตว์</h2>
+                        <div class="form-group">
+                            <label>ชนิดสัตว์</label>
+                            <select id="edit_animal_type">
+                                <option value="แกะ">🐑 แกะ</option>
+                                <option value="แพะ">🐐 แพะ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสสัตว์ (ID)</label>
+                            <input type="text" id="edit_sheep_id" readonly style="background: #f0f0f0;">
+                        </div>
+                        <div class="form-group">
+                            <label>เพศ</label>
+                            <select id="edit_gender">
+                                <option value="ตัวผู้">ตัวผู้</option>
+                                <option value="ตัวเมีย">ตัวเมีย</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>วันเกิด (YYYY-MM-DD)</label>
+                            <input type="date" id="edit_dob">
+                        </div>
+                        <div class="form-group">
+                            <label>สายพันธุ์</label>
+                            <input type="text" id="edit_breed">
+                        </div>
+                        <div class="form-group">
+                            <label>น้ำหนัก (กก.)</label>
+                            <input type="number" id="edit_weight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>สีแท็กติดหูแกะ</label>
+                            <select id="edit_tag_color">
+                                <option value="-">ยังไม่ระบุสี</option>
+                                <option value="กลมสีเหลือง">แท็กกลมสีเหลือง</option>
+                                <option value="สีแดง">สีแดง</option>
+                                <option value="สีฟ้า">สีฟ้า</option>
+                                <option value="สีน้ำเงิน">สีน้ำเงิน</option>
+                                <option value="สีเขียว">สีเขียว</option>
+                                <option value="สีเหลือง">สีเหลือง</option>
+                                <option value="สีส้ม">สีส้ม</option>
+                                <option value="สีม่วง">สีม่วง</option>
+                                <option value="สีชมพู">สีชมพู</option>
+                                <option value="สีขาว">สีขาว</option>
+                                <option value="สีดำ">สีดำ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>สถานะ</label>
+                            <select id="edit_status" onchange="toggleDeathDate(this.value)">
+                                <option value="ปกติ">ปกติ</option>
+                                <option value="ป่วย">ป่วย</option>
+                                <option value="หาย">หาย</option>
+                                <option value="ตาย">ตาย</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="death_date_group" style="display: none;">
+                            <label id="death_date_label">วันที่ตาย (YYYY-MM-DD)</label>
+                            <input type="date" id="edit_death_date">
+                        </div>
+                        <button onclick="editSheep()" style="width: 100%; margin-top: 20px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+
+                <!-- Feeding -->
+                <div id="feeding" class="section">
+                    <h2>🍽️ บันทึกการให้อาหาร</h2>
+                    <div id="feeding-alert"></div>
+
+                    <h3>📝 บันทึกการให้อาหาร</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>เลือกสัตว์ (แกะ/แพะ)</label>
+                                <select id="feeding_sheep_id">
+                                    <option value="all">เลือกทั้งหมด (แกะ/แพะ)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>ประเภทอาหาร</label>
+                                <select id="feed_type">
+                                    <option value="">เลือกอาหาร</option>
+                                    <option value="หญ้า">หญ้า</option>
+                                    <option value="อาหารข้าว">อาหารข้าว</option>
+                                    <option value="นม">นม</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>ปริมาณ (กก.)</label>
+                                <input type="number" id="feed_quantity" placeholder="50" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>หมายเหตุ</label>
+                                <input type="text" id="feed_notes" placeholder="ตัวอย่าง: หญ้าสด">
+                            </div>
+                            <button onclick="recordFeeding()">บันทึก</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">📊 ประวัติการให้อาหาร (10 รายการล่าสุด)</h3>
+                    <button onclick="loadFeedingHistory()" style="margin-bottom: 20px;">รีเฟรช</button>
+                    <div id="feeding-history"></div>
+                </div>
+
+                <!-- Edit Feeding Modal -->
+                <div id="editFeedingModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+                        <span onclick="closeEditFeedingModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>แก้ไขประวัติการให้อาหาร</h2>
+                        <div class="form-group">
+                            <label>ID ของบันทึก</label>
+                            <input type="text" id="edit_feeding_id" readonly style="background: #f0f0f0;">
+                        </div>
+                        <div class="form-group">
+                            <label>ประเภทอาหาร</label>
+                            <select id="edit_feeding_type">
+                                <option value="หญ้า">หญ้า</option>
+                                <option value="อาหารข้าว">อาหารข้าว</option>
+                                <option value="นม">นม</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>ปริมาณ (กก.)</label>
+                            <input type="number" id="edit_feeding_quantity" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>หมายเหตุ</label>
+                            <input type="text" id="edit_feeding_notes">
+                        </div>
+                        <button onclick="editFeeding()" style="width: 100%; margin-top: 20px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+
+                <!-- Health -->
+                <div id="health" class="section">
+                    <h2>💉 สุขภาพ/วัคซีน</h2>
+                    <div id="health-alert"></div>
+
+                    <h3>📝 บันทึกสุขภาพ</h3>
+                    <div class="form-group">
+                        <label>รหัสสัตว์ (แกะ/แพะ)</label>
+                        <select id="health_sheep_id">
+                            <option value="">เลือกสัตว์</option>
+                        </select>
+                    </div>
+
+                    <div id="health-type-tabs" style="margin-bottom: 20px;">
+                        <button onclick="setHealthType('examination')" style="margin-right: 10px;">ตรวจสุขภาพ</button>
+                        <button onclick="setHealthType('vaccine')">ฉีดวัคซีน</button>
+                    </div>
+
+                    <div id="examination-form" style="display: none;">
+                        <div class="form-group">
+                            <label>สถานะสุขภาพ</label>
+                            <select id="health_status"
+                                onchange="toggleHealthDeathDate(this.value, 'health_death_date_group', 'health_death_date')">
+                                <option value="">เลือก</option>
+                                <option value="ปกติ">ปกติ</option>
+                                <option value="ป่วย">ป่วย</option>
+                                <option value="หาย">หาย</option>
+                                <option value="ตาย">ตาย</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="health_death_date_group" style="display: none;">
+                            <label id="health_death_date_label">วันที่ตาย (YYYY-MM-DD)</label>
+                            <input type="date" id="health_death_date">
+                        </div>
+                        <div class="form-group">
+                            <label>อาการ</label>
+                            <textarea id="health_symptoms" placeholder="ระบุอาการถ้ามี" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>อุณหภูมิ (°C)</label>
+                            <input type="number" id="health_temp" placeholder="39.5" step="0.1">
+                        </div>
+                        <button onclick="recordHealthExamination()">บันทึก</button>
+                    </div>
+
+                    <div id="vaccine-form">
+                        <div class="form-group">
+                            <label>ชื่อวัคซีน</label>
+                            <input type="text" id="vaccine_name" placeholder="เช่น โคซาม">
+                        </div>
+                        <div class="form-group">
+                            <label>เข็มที่</label>
+                            <input type="number" id="injection_number" min="1" placeholder="เช่น 1, 2, 3">
+                        </div>
+                        <div class="form-group">
+                            <label>วันฉีด (YYYY-MM-DD)</label>
+                            <input type="date" id="vaccine_date">
+                        </div>
+                        <div class="form-group">
+                            <label>วันฉีดครั้งต่อไป (YYYY-MM-DD)</label>
+                            <input type="date" id="next_vaccine_date">
+                        </div>
+                        <button onclick="recordVaccine()">บันทึก</button>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">📋 ประวัติสุขภาพ</h3>
+                    <div class="form-group">
+                        <select id="health_history_id" onchange="loadHealthHistory()">
+                            <option value="">เลือกสัตว์เพื่อดูประวัติ</option>
+                        </select>
+                        
+                    </div>
+                    <div id="health-history"></div>
+                </div>
+
+                <!-- Edit Health Modal -->
+                <div id="editHealthModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+                        <span onclick="closeEditHealthModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>แก้ไขประวัติสุขภาพ</h2>
+
+                        <div id="examination-edit-form" style="display: none;">
+                            <div class="form-group">
+                                <label>สถานะสุขภาพ</label>
+                                <select id="edit_health_status"
+                                    onchange="toggleHealthDeathDate(this.value, 'edit_health_death_date_group', 'edit_health_death_date')">
+                                    <option value="ปกติ">ปกติ</option>
+                                    <option value="ป่วย">ป่วย</option>
+                                    <option value="หาย">หาย</option>
+                                    <option value="ตาย">ตาย</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="edit_health_death_date_group" style="display: none;">
+                                <label id="edit_health_death_date_label">วันที่ตาย (YYYY-MM-DD)</label>
+                                <input type="date" id="edit_health_death_date">
+                            </div>
+                            <div class="form-group">
+                                <label>อาการ</label>
+                                <textarea id="edit_health_symptoms" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>อุณหภูมิ (°C)</label>
+                                <input type="number" id="edit_health_temp" step="0.1">
+                            </div>
+                        </div>
+
+                        <div id="vaccine-edit-form" style="display: none;">
+                            <div class="form-group">
+                                <label>ชื่อวัคซีน</label>
+                                <input type="text" id="edit_vaccine_name">
+                            </div>
+                            <div class="form-group">
+                                <label>เข็มที่</label>
+                                <input type="number" id="edit_injection_number" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>วันฉีด (YYYY-MM-DD)</label>
+                                <input type="date" id="edit_vaccine_date">
+                            </div>
+                            <div class="form-group">
+                                <label>วันฉีดครั้งต่อไป (YYYY-MM-DD)</label>
+                                <input type="date" id="edit_next_vaccine_date">
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="edit_health_sheep_id">
+                        <input type="hidden" id="edit_health_record_index">
+                        <input type="hidden" id="edit_health_type">
+
+                        <button onclick="editHealth()" style="width: 100%; margin-top: 20px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+
+                <!-- Breeding -->
+                <div id="breeding" class="section">
+                    <h2>👶 ผสมพันธุ์และการคลอด</h2>
+                    <div id="breeding-alert"></div>
+
+                    <h3>📝 วางแผนผสมพันธุ์</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>รหัสสัตว์ตัวเมีย (แกะ/แพะ)</label>
+                                <select id="female_id"><option value="">เลือกสัตว์ตัวเมีย</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label>วันผสมพันธุ์ (YYYY-MM-DD)</label>
+                                <input type="date" id="breeding_date">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>รหัสสัตว์ตัวผู้ (แกะ/แพะ)</label>
+                                <select id="male_id"><option value="">เลือกสัตว์ตัวผู้</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label>วันคลอดที่คาดหวัง (YYYY-MM-DD)</label>
+                                <input type="date" id="expected_date">
+                            </div>
+                            <button onclick="planBreeding()">บันทึก</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">👼 บันทึกการคลอด</h3>
+                    <button onclick="loadPendingBreeding()" style="margin-bottom: 20px;">ดูรายการรอติดตาม</button>
+                    <div id="pending-breeding"></div>
+                </div>
+
+                <!-- Edit Lambing Modal -->
+                <div id="editLambingModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                        <span onclick="closeEditLambingModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>แก้ไขบันทึกการคลอด</h2>
+                        <div class="form-group">
+                            <label>ID ของบันทึก</label>
+                            <input type="text" id="edit_lambing_id" readonly style="background: #f0f0f0;">
+                        </div>
+                        <div class="form-group">
+                            <label>วันคลอด (YYYY-MM-DD)</label>
+                            <input type="date" id="edit_lambing_date">
+                        </div>
+                        <div id="edit_lambs_list"></div>
+                        <button onclick="editLambing()" style="width: 100%; margin-top: 20px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+
+                <!-- Edit Breeding Plan Modal -->
+                <div id="editBreedingPlanModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 450px;">
+                        <span onclick="closeEditBreedingPlanModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>✏️ แก้ไขแผนผสมพันธุ์</h2>
+                        <input type="hidden" id="edit_bp_record_id">
+                        <div class="form-group">
+                            <label>รหัสสัตว์ตัวเมีย (แกะ/แพะ)</label>
+                            <select id="edit_bp_female_id"><option value="">เลือกสัตว์ตัวเมีย</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสสัตว์ตัวผู้ (แกะ/แพะ)</label>
+                            <select id="edit_bp_male_id"><option value="">เลือกสัตว์ตัวผู้</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>วันผสมพันธุ์ (YYYY-MM-DD)</label>
+                            <input type="date" id="edit_bp_breeding_date">
+                        </div>
+                        <div class="form-group">
+                            <label>วันคลอดที่คาดหวัง (YYYY-MM-DD)</label>
+                            <input type="date" id="edit_bp_expected_date">
+                        </div>
+                        <button onclick="editBreedingPlan()"
+                            style="width: 100%; margin-top: 20px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+
+                <!-- Feed Stock -->
+                <div id="feed-stock" class="section">
+                    <h2>📦 จัดการคลังอาหาร</h2>
+                    <div id="feedstock-alert"></div>
+
+                    <h3>📝 เพิ่มอาหารใหม่</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>ประเภทอาหาร</label>
+                                <input type="text" id="new_feed_type" placeholder="หญ้า, อาหารข้าว, นม">
+                            </div>
+                            <div class="form-group">
+                                <label>ปริมาณปัจจุบัน (กก.)</label>
+                                <input type="number" id="new_feed_qty" placeholder="500" step="0.1">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>ระดับขั้นต่ำ (กก.)</label>
+                                <input type="number" id="new_feed_min" placeholder="100" step="0.1">
+                            </div>
+                            <button onclick="addFeedStock()">เพิ่ม</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">📦 สต็อกอาหารในคลัง</h3>
+                    <button onclick="loadFeedStock()" style="margin-bottom: 20px;">รีเฟรช</button>
+                    <div id="feed-stock-list"></div>
+
+                    <h3 style="margin-top: 30px;">📝 อัปเดตปริมาณ</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>ประเภทอาหาร</label>
+                                <select id="update_feed_type"></select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>เพิ่ม (+) / ลด (-)</label>
+                                <select id="update_operation" style="margin-bottom: 12px;">
+                                    <option value="+">เพิ่ม (+)</option>
+                                    <option value="-">ลด (-)</option>
+                                </select>
+                                <input type="number" id="update_qty" placeholder="ปริมาณ" step="0.1"
+                                    style="display: block;">
+                            </div>
+                            <button onclick="updateFeedStock()">อัปเดต</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dead or Missing Animals -->
+                <div id="dead" class="section">
+                    <h2>⚰️ ทะเบียนสัตว์ตาย/หาย</h2>
+                    <div id="dead-alert"></div>
+                    <h3 style="margin-top: 20px;">📋 ข้อมูลแกะและแพะที่เสียชีวิตหรือหายสาบสูญ</h3>
+                    <button onclick="loadDeadSheepList()" style="margin-bottom: 20px;">รีเฟรช</button>
+                    <div id="dead-sheep-list" class="table-responsive"></div>
+                </div>
+
+                <!-- Report -->
+                <div id="report" class="section">
+                    <h2>📈 รายงานฟาร์ม</h2>
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="generateReport()" style="background-color: #3b82f6;">สร้างรายงาน</button>
+                        <button onclick="printReport()" style="background-color: #f59e0b;">🖨️ พิมพ์รายงาน</button>
+                        <button onclick="exportToExcel()" style="background-color: #10b981;">📊 ดาวน์โหลด Excel</button>
+                    </div>
+                    <div id="report-content"></div>
+                </div>
+                <!-- Users Management (Admin only) -->
+                <div id="users" class="section">
+                    <h2>👥 จัดการผู้ใช้งานระบบ</h2>
+                    <div id="users-alert"></div>
+
+                    <h3>➕ เพิ่มผู้ใช้ใหม่</h3>
+                    <div class="row">
+                        <div>
+                            <div class="form-group">
+                                <label>ชื่อผู้ใช้ (Username)</label>
+                                <input type="text" id="new_username" placeholder="เช่น staff01">
+                            </div>
+                            <div class="form-group">
+                                <label>ชื่อ-สกุล / ชื่อแสดง</label>
+                                <input type="text" id="new_display_name" placeholder="เช่น นาย สมชาย ใจดี">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>รหัสผ่าน</label>
+                                <input type="password" id="new_password" placeholder="รหัสผ่านอย่างน้อย 6 ตัว">
+                            </div>
+                            <div class="form-group">
+                                <label>ระดับสิทธิ์</label>
+                                <select id="new_role">
+                                    <option value="user">👤 ผู้ใช้ทั่วไป - ใช้งานและบันทึกข้อมูล</option>
+                                    <option value="admin">🔑 Admin - จัดการระบบทั้งหมด</option>
+                                </select>
+                            </div>
+                            <button onclick="createUser()">➕ เพิ่มผู้ใช้</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">📋 รายชื่อผู้ใช้ทั้งหมด</h3>
+                    <button onclick="loadUsers()" style="margin-bottom: 20px;">รีเฟรช</button>
+                    <div id="users-list" class="table-responsive"></div>
+                </div>
+
+                <!-- Change Password Modal -->
+                <div id="changePasswordModal"
+                    style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);">
+                    <div
+                        style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+                        <span onclick="closeChangePasswordModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2 style="margin-bottom: 20px; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                            🔑 เปลี่ยนรหัสผ่าน</h2>
+                        <div id="cp-alert"></div>
+                        <div class="form-group">
+                            <label>รหัสผ่านเดิม</label>
+                            <input type="password" id="cp_old_password" placeholder="กรอกรหัสผ่านปัจจุบัน">
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสผ่านใหม่</label>
+                            <input type="password" id="cp_new_password" placeholder="อย่างน้อย 6 ตัวอักษร">
+                        </div>
+                        <div class="form-group">
+                            <label>ยืนยันรหัสผ่านใหม่</label>
+                            <input type="password" id="cp_confirm_password" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง">
+                        </div>
+                        <button onclick="doChangePassword()"
+                            style="width: 100%; margin-top: 15px; padding: 12px; font-size: 1rem; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
+                            ยืนยันการเปลี่ยนรหัส
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Edit User Modal -->
+                <div id="editUserModal"
+                    style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                    <div
+                        style="background-color: white; margin: 10% auto; padding: 24px; border-radius: 12px; width: 80%; max-width: 420px;">
+                        <span onclick="closeEditUserModal()"
+                            style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                        <h2>✏️ แก้ไขข้อมูลผู้ใช้</h2>
+                        <input type="hidden" id="edit_username">
+                        <div class="form-group">
+                            <label>ชื่อแสดง</label>
+                            <input type="text" id="edit_display_name">
+                        </div>
+                        <div class="form-group">
+                            <label>ระดับสิทธิ์</label>
+                            <select id="edit_role">
+                                <option value="user">👤 ผู้ใช้ทั่วไป</option>
+                                <option value="admin">🔑 Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสผ่านใหม่ (เว้นว่างเพื่อไม่เปลี่ยน)</label>
+                            <input type="password" id="edit_user_password" placeholder="ใหม่เท่านั้น">
+                        </div>
+                        <div class="form-group">
+                            <label>สถานะ</label>
+                            <select id="edit_user_active">
+                                <option value="true">✅ เปิดใช้งาน</option>
+                                <option value="false">❌ ปิดใช้งาน</option>
+                            </select>
+                        </div>
+                        <button onclick="updateUser()" style="width: 100%; margin-top: 12px;">บันทึกการแก้ไข</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Call checkSession on load
+        document.addEventListener('DOMContentLoaded', checkSession);
+
+        // ===== SESSION CHECK =====
+        async function checkSession() {
+            try {
+                const res = await fetch('/api/me');
+                if (res.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                const data = await res.json();
+                if (data.status === 'success') {
+                    currentUser = data.user;
+                    document.getElementById('ui-display-name').textContent = data.user.display_name;
+                    const roleLabels = { admin: '🔑 Admin', user: '👤 ผู้ใช้ทั่วไป' };
+                    document.getElementById('ui-role-badge').textContent = roleLabels[data.user.role] || data.user.role;
+                    // Show admin menu
+                    if (data.user.role === 'admin') {
+                        document.getElementById('menu-users').style.display = 'flex';
+                    }
+                    // ผู้ใช้ทั่วไปไม่มีสิทธิ์จัดการผู้ใช้งานระบบ
+                    if (data.user.role === 'user') {
+                        document.querySelectorAll('button[onclick*="register"], button[onclick*="record"], button[onclick*="plan"], button[onclick*="add"], button[onclick*="update"], button[onclick*="edit"], button[onclick*="delete"]').forEach(btn => {
+                            btn.disabled = true;
+                            btn.title = 'คุณไม่มีสิทธิ์แก้ไขข้อมูล';
+                            btn.style.opacity = '0.4';
+                            btn.style.cursor = 'not-allowed';
+                        });
+                        // Also hide some fields or specific UI elements if needed
+                        const manageUsersBtn = document.getElementById('menu-users');
+                        if (manageUsersBtn) manageUsersBtn.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.error('Session check failed', e);
+            }
+        }
+
+        async function doLogout() {
+            if (!confirm('ต้องการออกจากระบบ?')) return;
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        }
+
+        // ===== CHANGE PASSWORD =====
+        function openChangePasswordModal() {
+            document.getElementById('cp_old_password').value = '';
+            document.getElementById('cp_new_password').value = '';
+            document.getElementById('cp_confirm_password').value = '';
+            document.getElementById('cp-alert').innerHTML = '';
+            document.getElementById('changePasswordModal').style.display = 'block';
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').style.display = 'none';
+        }
+
+        async function doChangePassword() {
+            const old_password = document.getElementById('cp_old_password').value;
+            const new_password = document.getElementById('cp_new_password').value;
+            const confirm_password = document.getElementById('cp_confirm_password').value;
+
+            if (!old_password || !new_password || !confirm_password) {
+                showAlert('cp-alert', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+
+            if (new_password !== confirm_password) {
+                showAlert('cp-alert', 'รหัสผ่านใหม่ไม่ตรงกัน', 'error');
+                return;
+            }
+
+            if (new_password.length < 6) {
+                showAlert('cp-alert', 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ old_password, new_password })
+                });
+                const data = await res.json();
+
+                showAlert('cp-alert', data.message, data.status);
+                if (data.status === 'success') {
+                    setTimeout(closeChangePasswordModal, 2000);
+                }
+            } catch (e) {
+                showAlert('cp-alert', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            }
+        }
+
+        // ===== USER MANAGEMENT =====
+        function loadUsers() {
+            fetch('/api/users')
+                .then(r => r.json())
+                .then(data => {
+                    const roleLabels = { admin: '🔑 Admin', user: '👤 ผู้ใช้ทั่วไป' };
+                    let html = '<table><tr><th>Username</th><th>ชื่อแสดง</th><th>สิทธิ์</th><th>สร้างเมื่อ</th><th>สถานะ</th><th>จัดการ</th></tr>';
+                    data.forEach(user => {
+                        const activeTag = user.active
+                            ? '<span style="color:#22c55e;">✅ เปิด</span>'
+                            : '<span style="color:#ef4444;">❌ ปิด</span>';
+                        html += `<tr>
+                            <td><strong>${user.username}</strong></td>
+                            <td>${user.display_name}</td>
+                            <td>${roleLabels[user.role] || user.role}</td>
+                            <td>${user.created_at}</td>
+                            <td>${activeTag}</td>
+                            <td>
+                                <button onclick="openEditUserModal('${user.username}', '${user.display_name}', '${user.role}', ${user.active})" style="padding: 5px 10px; font-size: 0.85em; margin-right:4px;">✏️ แก้ไข</button>
+                                ${user.username !== 'admin' ? `<button onclick="deleteUser('${user.username}')" style="padding: 5px 10px; background: #dc3545; font-size: 0.85em;">🗑️ ลบ</button>` : ''}
+                            </td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    document.getElementById('users-list').innerHTML = html;
+                }).catch(() => showAlert('users-alert', 'ไม่มีสิทธิ์เข้าถึงข้อมูลผู้ใช้', 'error'));
+        }
+
+        function createUser() {
+            const data = {
+                username: document.getElementById('new_username').value.trim(),
+                display_name: document.getElementById('new_display_name').value.trim(),
+                password: document.getElementById('new_password').value,
+                role: document.getElementById('new_role').value
+            };
+            if (!data.username || !data.password || !data.display_name) {
+                showAlert('users-alert', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error'); return;
+            }
+            if (data.password.length < 6) {
+                showAlert('users-alert', 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', 'error'); return;
+            }
+            fetch('/api/users/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(r => r.json()).then(res => {
+                showAlert('users-alert', res.message, res.status);
+                if (res.status === 'success') {
+                    document.getElementById('new_username').value = '';
+                    document.getElementById('new_display_name').value = '';
+                    document.getElementById('new_password').value = '';
+                    loadUsers();
+                }
+            });
+        }
+
+        function openEditUserModal(username, displayName, role, active) {
+            document.getElementById('edit_username').value = username;
+            document.getElementById('edit_display_name').value = displayName;
+            document.getElementById('edit_role').value = role;
+            document.getElementById('edit_user_active').value = String(active);
+            document.getElementById('edit_user_password').value = '';
+            document.getElementById('editUserModal').style.display = 'block';
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+
+        function updateUser() {
+            const data = {
+                username: document.getElementById('edit_username').value,
+                display_name: document.getElementById('edit_display_name').value,
+                role: document.getElementById('edit_role').value,
+                password: document.getElementById('edit_user_password').value,
+                active: document.getElementById('edit_user_active').value === 'true'
+            };
+            fetch('/api/users/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(r => r.json()).then(res => {
+                showAlert('users-alert', res.message, res.status);
+                if (res.status === 'success') { closeEditUserModal(); loadUsers(); }
+            });
+        }
+
+        function deleteUser(username) {
+            if (!confirm(`ลบผู้ใช้ "${username}" ออกจากระบบ?`)) return;
+            fetch(`/api/users/delete/${username}`, { method: 'DELETE' })
+                .then(r => r.json()).then(res => {
+                    showAlert('users-alert', res.message, res.status);
+                    if (res.status === 'success') loadUsers();
+                });
+        }
+        let allSheepData = [];
+        let currentFilter = 'ทั้งหมด';
+
+        const BREEDS = {
+            'แกะ': ['ดอร์เปอร์ (Dorper)', 'ซานตาอิเนส (Santa Ines)', 'แคทาห์ดิน (Katahdin)', 'บอนด์ (Bond)', 'อังกฤษ', 'ไทยพื้นเมือง', 'ลูกผสม'],
+            'แพะ': ['บอร์ (Boer)', 'ซาเนน (Saanen)', 'แองโกลนูเบียน (Anglo-Nubian)', 'ทอกเกนเบิร์ก (Toggenburg)', 'ชามัวร์ (Alpine)', 'พื้นเมือง', 'ลูกผสม']
+        };
+
+        function onAnimalTypeChange(type) {
+            const breedList = document.getElementById('breed-suggestions');
+            if (breedList) {
+                breedList.innerHTML = (BREEDS[type] || []).map(b => `<option value="${b}">`).join('');
+            }
+            const labelId = document.getElementById('label-sheep-id');
+            if (labelId) labelId.textContent = `รหัส${type} (ID)`;
+            const btnReg = document.getElementById('btn-register-sheep');
+            if (btnReg) btnReg.textContent = `บันทึก${type}`;
+            const titleReg = document.getElementById('title-register-sheep');
+            if (titleReg) titleReg.textContent = `📝 ลงทะเบียน${type}ใหม่`;
+            const inputId = document.getElementById('sheep_id');
+            if (inputId) inputId.placeholder = type === 'แพะ' ? 'เช่น G001' : 'เช่น S001';
+        }
+
+        function setAnimalFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+            const filterId = filter === 'ทั้งหมด' ? 'filter-all' : (filter === 'แกะ' ? 'filter-sheep' : 'filter-goat');
+            const btn = document.getElementById(filterId);
+            if (btn) btn.classList.add('active');
+            renderSheepTable();
+        }
+
+        function showSection(sectionId, animalType = null) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+            // Show selected section
+            const targetSec = document.getElementById(sectionId);
+            if (targetSec) targetSec.classList.add('active');
+
+            // Set active menu item
+            if (sectionId === 'sheep' && animalType === 'แกะ') {
+                const m = document.getElementById('menu-sheep');
+                if (m) m.classList.add('active');
+            } else if (sectionId === 'sheep' && animalType === 'แพะ') {
+                const m = document.getElementById('menu-goat');
+                if (m) m.classList.add('active');
+            } else if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('menu-item')) {
+                window.event.currentTarget.classList.add('active');
+            } else if (window.event && window.event.target && window.event.target.classList.contains('menu-item')) {
+                window.event.target.classList.add('active');
+            }
+
+            if (sectionId === 'sheep') {
+                const titleSec = document.getElementById('livestock-section-title');
+                if (animalType) {
+                    setAnimalFilter(animalType);
+                    const animalTypeSel = document.getElementById('animal_type');
+                    if (animalTypeSel) {
+                        animalTypeSel.value = animalType;
+                        onAnimalTypeChange(animalType);
+                    }
+                    if (titleSec) titleSec.textContent = animalType === 'แพะ' ? '🐐 จัดการแพะ' : '🐑 จัดการแกะ';
+                } else {
+                    setAnimalFilter('ทั้งหมด');
+                    if (titleSec) titleSec.textContent = '🐑 จัดการแกะและแพะ';
+                }
+            }
+
+            // Load data for specific sections
+            if (sectionId === 'dashboard') loadDashboard();
+            if (sectionId === 'sheep') loadSheepList();
+            if (sectionId === 'health') loadHealthAnimals();
+            if (sectionId === 'feeding' || sectionId === 'breeding') loadAnimalOptions();
+            if (sectionId === 'feeding') loadFeedingHistory();
+            if (sectionId === 'feed-stock') loadFeedStock();
+            if (sectionId === 'dead') loadDeadSheepList();
+            if (sectionId === 'users') loadUsers();
+        }
+
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 5000);
+        }
+
+        // Dashboard
+        function loadDashboard() {
+            fetch('/api/report')
+                .then(r => r.json())
+                .then(data => {
+                    const totalAnimals = data.total_animals !== undefined ? data.total_animals : data.total_sheep;
+                    const totalOffspring = data.total_offspring !== undefined ? data.total_offspring : data.total_lambs;
+                    let html = `
+                        <div class="stat-card">
+                            <div class="stat-icon">🐾</div>
+                            <h3>${totalAnimals}</h3>
+                            <p>สัตว์ทั้งหมด (แกะ+แพะ)</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🐑</div>
+                            <h3>${data.total_sheep || 0}</h3>
+                            <p>แกะทั้งหมด (ผู้ ${data.male_sheep || 0} / เมีย ${data.female_sheep || 0})</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🐐</div>
+                            <h3>${data.total_goats || 0}</h3>
+                            <p>แพะทั้งหมด (ผู้ ${data.male_goats || 0} / เมีย ${data.female_goats || 0})</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <h3>${data.healthy}</h3>
+                            <p>สัตว์ปกติ</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🤒</div>
+                            <h3>${data.sick}</h3>
+                            <p>สัตว์ป่วย</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚰️</div>
+                            <h3>${data.dead} / ${data.missing}</h3>
+                            <p>ตาย / หาย</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👶</div>
+                            <h3>${totalOffspring}</h3>
+                            <p>ลูกสัตว์เกิดใหม่ (แกะ ${data.total_lambs || 0} / แพะ ${data.total_kids || 0})</p>
+                        </div>
+                    `;
+                    document.getElementById('stats').innerHTML = html;
+                });
+        }
+
+        // Sheep & Goat functions
+        function registerSheep() {
+            const animalType = document.getElementById('animal_type') ? document.getElementById('animal_type').value : 'แกะ';
+            const sheepId = document.getElementById('sheep_id').value.trim();
+            if (!sheepId) {
+                showAlert('sheep-alert', `กรุณาระบุรหัส${animalType}`, 'error');
+                return;
+            }
+
+            const data = {
+                sheep_id: sheepId,
+                animal_type: animalType,
+                gender: document.getElementById('gender').value,
+                dob: document.getElementById('dob').value,
+                breed: document.getElementById('breed').value.trim(),
+                weight: document.getElementById('weight').value,
+                tag_color: document.getElementById('tag_color').value
+            };
+
+            fetch('/api/sheep/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('sheep-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        document.getElementById('sheep_id').value = '';
+                        document.getElementById('gender').value = '';
+                        document.getElementById('dob').value = '';
+                        document.getElementById('breed').value = '';
+                        document.getElementById('weight').value = '';
+                        document.getElementById('tag_color').value = '-';
+                        loadSheepList();
+                    }
+                });
+        }
+
+        function loadSheepList() {
+            fetch('/api/sheep')
+                .then(r => r.json())
+                .then(data => {
+                    allSheepData = data;
+                    renderSheepTable();
+                    renderAnimalTagSummary();
+                });
+        }
+
+        function renderAnimalTagSummary() {
+            const summaryElement = document.getElementById('animal-tag-summary');
+            if (!summaryElement) return;
+
+            const activeAnimals = allSheepData.filter(sheep =>
+                sheep.status !== 'ตาย' && sheep.status !== 'หาย'
+            );
+            const groups = {};
+            const availableTagColors = ['กลมสีเหลือง', 'สีเหลือง', 'สีแดง', 'สีฟ้า', 'สีน้ำเงิน', 'สีเขียว', 'สีส้ม', 'สีม่วง', 'สีชมพู', 'สีขาว', 'สีดำ', '-'];
+            availableTagColors.forEach(tagColor => {
+                groups[tagColor] = { count: 0, isGoat: false };
+            });
+            activeAnimals.forEach(animal => {
+                const isGoat = (animal.animal_type || 'แกะ') === 'แพะ';
+                const key = isGoat ? 'แพะ' : (animal.tag_color || '-');
+                if (!groups[key]) groups[key] = { count: 0, isGoat };
+                groups[key].count += 1;
+            });
+
+            const colorOrder = ['สีเหลือง', 'สีแดง', 'สีฟ้า', 'สีน้ำเงิน', 'สีเขียว', 'สีส้ม', 'สีม่วง', 'สีชมพู', 'สีขาว', 'สีดำ', '-'];
+            const orderedGroups = Object.entries(groups).sort(([first], [second]) => {
+                if (first === 'แพะ') return 1;
+                if (second === 'แพะ') return -1;
+                return colorOrder.indexOf(first) - colorOrder.indexOf(second);
+            });
+            const total = activeAnimals.length;
+            const rows = orderedGroups.map(([label, group], index) => {
+                const displayLabel = group.isGoat
+                    ? 'แพะ'
+                    : label === '-'
+                        ? 'ยังไม่ระบุสี'
+                        : label === 'กลมสีเหลือง'
+                            ? 'แท็กกลมสีเหลือง'
+                            : `แท็ก${label}`;
+                const colorValue = group.isGoat || label === '-' ? '-' : label;
+                const colorMap = {
+                    'กลมสีเหลือง': '#facc15',
+                    'สีเหลือง': '#fde047',
+                    'สีแดง': '#ef4444',
+                    'สีฟ้า': '#93c5fd',
+                    'สีน้ำเงิน': '#2563eb',
+                    'สีเขียว': '#4d7c0f',
+                    'สีส้ม': '#ea580c',
+                    'สีม่วง': '#7e22ce',
+                    'สีชมพู': '#e879f9',
+                    'สีขาว': '#ffffff',
+                    'สีดำ': '#111827'
+                };
+                const colorSwatch = colorMap[colorValue]
+                    ? `<span style="display: inline-block; width: 18px; height: 18px; margin-right: 6px; vertical-align: middle; border-radius: 50%; background: ${colorMap[colorValue]}; border: 1px solid #94a3b8;"></span>`
+                    : '';
+                return `<tr>
+                    <td>${index + 1}</td>
+                    <td>${displayLabel}</td>
+                    <td>${colorSwatch}${colorValue}</td>
+                    <td>${group.count}</td>
+                    <td>ตัว</td>
+                </tr>`;
+            }).join('');
+
+            summaryElement.innerHTML = `<table style="width: 100%; min-width: 560px; border-collapse: collapse; text-align: center;">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>สีแท็ก</th>
+                        <th>ค่าสีแท็ก</th>
+                        <th>จำนวน</th>
+                        <th>หน่วยนับ</th>
+                    </tr>
+                </thead>
+                <tbody>${rows || '<tr><td colspan="5">ยังไม่มีข้อมูลสัตว์</td></tr>'}</tbody>
+                <tfoot>
+                    <tr><th colspan="3">ยอดรวม</th><th>${total}</th><th>ตัว</th></tr>
+                </tfoot>
+            </table>`;
+        }
+
+        function renderSheepTable() {
+            let activeAnimals = allSheepData.filter(s => s.status !== 'ตาย' && s.status !== 'หาย');
+            if (currentFilter !== 'ทั้งหมด') {
+                activeAnimals = activeAnimals.filter(s => (s.animal_type || 'แกะ') === currentFilter);
+            }
+
+            let html = '<table><tr><th>รหัส</th><th>ชนิด</th><th>เพศ</th><th>วันเกิด</th><th>สายพันธุ์</th><th>น้ำหนัก (กก.)</th><th>สถานะ</th><th>จัดการ</th></tr>';
+            activeAnimals.forEach(sheep => {
+                const type = sheep.animal_type || 'แกะ';
+                const badge = type === 'แพะ' 
+                    ? '<span class="badge" style="background:#f59e0b; color:white; padding: 4px 10px; border-radius:12px; font-size:0.85em; font-weight:600;">🐐 แพะ</span>'
+                    : '<span class="badge" style="background:#10b981; color:white; padding: 4px 10px; border-radius:12px; font-size:0.85em; font-weight:600;">🐑 แกะ</span>';
+                html += `<tr>
+                    <td><strong>${sheep.id}</strong></td>
+                    <td>${badge}</td>
+                    <td>${sheep.gender}</td>
+                    <td>${sheep.dob || '-'}</td>
+                    <td>${sheep.breed || '-'}</td>
+                    <td>${sheep.weight || '-'}</td>
+                    <td><span class="badge ${sheep.status === 'ป่วย' ? 'badge-warning' : 'badge-success'}">${sheep.status}</span></td>
+                    <td>
+                        <button onclick="openEditModal('${sheep.id}', '${sheep.gender}', '${sheep.dob || ''}', '${sheep.breed || ''}', '${sheep.weight || ''}', '${sheep.status}', '${sheep.death_date || ''}', '${type}', '${sheep.tag_color || '-'}')" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em;">✏️ แก้ไข</button>
+                        <button onclick="deleteSheep('${sheep.id}')" style="padding: 5px 10px; background: #dc3545; font-size: 0.9em;">🗑️ ลบ</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</table>';
+            if (activeAnimals.length === 0) {
+                html = `<p style="text-align:center; padding: 25px; color: #94a3b8;">ไม่มีข้อมูล${currentFilter === 'ทั้งหมด' ? 'สัตว์' : currentFilter}ที่กำลังเลี้ยง</p>`;
+            }
+            document.getElementById('sheep-list').innerHTML = html;
+        }
+
+        function loadDeadSheepList() {
+            fetch('/api/sheep')
+                .then(r => r.json())
+                .then(data => {
+                    const deadSheep = data.filter(sheep => sheep.status === 'ตาย' || sheep.status === 'หาย');
+                    let html = '<table><tr><th>รหัส</th><th>ชนิด</th><th>เพศ</th><th>วันเกิด</th><th>วันที่ (ตาย/หาย)</th><th>สถานะ</th><th>สายพันธุ์</th><th>จัดการ</th></tr>';
+                    deadSheep.forEach(sheep => {
+                        const type = sheep.animal_type || 'แกะ';
+                        const badge = type === 'แพะ' 
+                            ? '<span class="badge" style="background:#f59e0b; color:white; padding: 3px 8px; border-radius:10px; font-size:0.8em;">🐐 แพะ</span>'
+                            : '<span class="badge" style="background:#10b981; color:white; padding: 3px 8px; border-radius:10px; font-size:0.8em;">🐑 แกะ</span>';
+                        html += `<tr>
+                            <td><strong>${sheep.id}</strong></td>
+                            <td>${badge}</td>
+                            <td>${sheep.gender}</td>
+                            <td>${sheep.dob || '-'}</td>
+                            <td><span style="color: #ef4444; font-weight: bold;">${sheep.death_date || '-'}</span></td>
+                            <td><span class="badge ${sheep.status === 'ตาย' ? 'badge-danger' : 'badge-warning'}">${sheep.status}</span></td>
+                            <td>${sheep.breed || '-'}</td>
+                            <td>
+                                <button onclick="openEditModal('${sheep.id}', '${sheep.gender}', '${sheep.dob || ''}', '${sheep.breed || ''}', '${sheep.weight || ''}', '${sheep.status}', '${sheep.death_date || ''}', '${type}', '${sheep.tag_color || '-'}')" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em; background: linear-gradient(135deg, #64748b 0%, #475569 100%);">✏️ แก้ไข</button>
+                                <button onclick="deleteSheep('${sheep.id}')" style="padding: 5px 10px; background: #dc3545; font-size: 0.9em;">🗑️ ลบ</button>
+                            </td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    if (deadSheep.length === 0) {
+                        html = '<p style="text-align:center; padding: 20px; color: #64748b;">ไม่มีข้อมูลสัตว์ตายและหาย</p>';
+                    }
+                    document.getElementById('dead-sheep-list').innerHTML = html;
+                });
+        }
+
+        function openEditModal(sheepId, gender, dob, breed, weight, status, deathDate = '', animalType = 'แกะ', tagColor = '-') {
+            document.getElementById('edit_sheep_id').value = sheepId;
+            if (document.getElementById('edit_animal_type')) document.getElementById('edit_animal_type').value = animalType || 'แกะ';
+            document.getElementById('edit_gender').value = gender;
+            document.getElementById('edit_dob').value = dob;
+            document.getElementById('edit_breed').value = breed;
+            document.getElementById('edit_weight').value = weight;
+            document.getElementById('edit_tag_color').value = tagColor || '-';
+            document.getElementById('edit_status').value = status;
+            document.getElementById('edit_death_date').value = deathDate || '';
+            toggleDeathDate(status);
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function toggleDeathDate(status) {
+            const deathGroup = document.getElementById('death_date_group');
+            const deathLabel = document.getElementById('death_date_label');
+            if (status === 'ตาย' || status === 'หาย') {
+                deathGroup.style.display = 'block';
+                deathLabel.textContent = status === 'ตาย' ? 'วันที่ตาย (YYYY-MM-DD)' : 'วันที่หาย (YYYY-MM-DD)';
+                if (!document.getElementById('edit_death_date').value) {
+                    document.getElementById('edit_death_date').value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                deathGroup.style.display = 'none';
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function editSheep() {
+            const data = {
+                sheep_id: document.getElementById('edit_sheep_id').value,
+                animal_type: document.getElementById('edit_animal_type') ? document.getElementById('edit_animal_type').value : 'แกะ',
+                gender: document.getElementById('edit_gender').value,
+                dob: document.getElementById('edit_dob').value,
+                breed: document.getElementById('edit_breed').value,
+                weight: document.getElementById('edit_weight').value,
+                tag_color: document.getElementById('edit_tag_color').value,
+                status: document.getElementById('edit_status').value,
+                death_date: document.getElementById('edit_death_date').value
+            };
+
+            fetch('/api/sheep/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('sheep-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        closeEditModal();
+                        loadSheepList();
+                    }
+                });
+        }
+
+        function deleteSheep(sheepId) {
+            if (confirm(`คุณแน่ใจหรือที่จะลบข้อมูลสัตว์รหัส ${sheepId}?`)) {
+                fetch(`/api/sheep/delete/${sheepId}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        showAlert('sheep-alert', res.message, res.status);
+                        if (res.status === 'success') {
+                            loadSheepList();
+                        }
+                    });
+            }
+        }
+
+        // Feeding functions
+        function recordFeeding() {
+            const sheepIds = document.getElementById('feeding_sheep_id').value === 'all'
+                ? []
+                : [document.getElementById('feeding_sheep_id').value];
+
+            const data = {
+                sheep_ids: sheepIds,
+                feed_type: document.getElementById('feed_type').value,
+                quantity: document.getElementById('feed_quantity').value,
+                notes: document.getElementById('feed_notes').value
+            };
+
+            fetch('/api/feeding/record', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('feeding-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        document.getElementById('feeding_sheep_id').value = 'all';
+                        document.getElementById('feed_type').value = '';
+                        document.getElementById('feed_quantity').value = '';
+                        document.getElementById('feed_notes').value = '';
+                        loadFeedingHistory();
+                    }
+                });
+        }
+
+        function loadFeedingHistory() {
+            fetch('/api/feeding')
+                .then(r => r.json())
+                .then(data => {
+                    let html = '';
+                    data.reverse().forEach(record => {
+                        html += `<div class="card">
+                            <h3>${record.data.feed_type}</h3>
+                            <p>วันที่: ${record.data.date}</p>
+                            <p>ปริมาณ: ${record.data.quantity} กท.</p>
+                            <p>แกะ: ${record.data.sheep_ids.join(', ')}</p>
+                            <p>หมายเหตุ: ${record.data.notes}</p>
+                            <div style="margin-top: 10px;">
+                                <button onclick="openEditFeedingModal('${record.id}', '${record.data.feed_type}', '${record.data.quantity}', '${record.data.notes}')" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em;">✏️ แก้ไข</button>
+                                <button onclick="deleteFeeding('${record.id}')" style="padding: 5px 10px; background: #dc3545; font-size: 0.9em;">🗑️ ลบ</button>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('feeding-history').innerHTML = html || '<p>ไม่มีประวัติ</p>';
+                });
+        }
+
+        function openEditFeedingModal(recordId, feedType, quantity, notes) {
+            document.getElementById('edit_feeding_id').value = recordId;
+            document.getElementById('edit_feeding_type').value = feedType;
+            document.getElementById('edit_feeding_quantity').value = quantity;
+            document.getElementById('edit_feeding_notes').value = notes;
+            document.getElementById('editFeedingModal').style.display = 'block';
+        }
+
+        function closeEditFeedingModal() {
+            document.getElementById('editFeedingModal').style.display = 'none';
+        }
+
+        function editFeeding() {
+            const data = {
+                record_id: document.getElementById('edit_feeding_id').value,
+                feed_type: document.getElementById('edit_feeding_type').value,
+                quantity: document.getElementById('edit_feeding_quantity').value,
+                notes: document.getElementById('edit_feeding_notes').value
+            };
+
+            fetch('/api/feeding/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('feeding-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        closeEditFeedingModal();
+                        loadFeedingHistory();
+                    }
+                });
+        }
+
+        function deleteFeeding(recordId) {
+            if (confirm('คุณแน่ใจหรือที่จะลบประวัติการให้อาหารนี้?')) {
+                fetch(`/api/feeding/delete/${recordId}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        showAlert('feeding-alert', res.message, res.status);
+                        if (res.status === 'success') {
+                            loadFeedingHistory();
+                        }
+                    });
+            }
+        }
+
+        // Health functions
+        function loadAnimalOptions() {
+            fetch('/api/sheep')
+                .then(r => r.json())
+                .then(animals => {
+                    const activeAnimals = animals
+                        .filter(animal => animal.status !== 'ตาย' && animal.status !== 'หาย')
+                        .sort((first, second) => (first.id || '').localeCompare(second.id || ''));
+                    const formatOption = animal => `<option value="${animal.id}">${animal.id} (${animal.animal_type || 'แกะ'})</option>`;
+                    const feedingSelect = document.getElementById('feeding_sheep_id');
+                    if (feedingSelect) {
+                        feedingSelect.innerHTML = '<option value="all">เลือกทั้งหมด (แกะ/แพะ)</option>' + activeAnimals.map(formatOption).join('');
+                    }
+                    ['female_id', 'edit_bp_female_id'].forEach(id => {
+                        const select = document.getElementById(id);
+                        if (select) select.innerHTML = '<option value="">เลือกสัตว์ตัวเมีย</option>' + activeAnimals.filter(animal => animal.gender === 'ตัวเมีย').map(formatOption).join('');
+                    });
+                    ['male_id', 'edit_bp_male_id'].forEach(id => {
+                        const select = document.getElementById(id);
+                        if (select) select.innerHTML = '<option value="">เลือกสัตว์ตัวผู้</option>' + activeAnimals.filter(animal => animal.gender === 'ตัวผู้').map(formatOption).join('');
+                    });
+                });
+        }
+
+        function loadHealthAnimals() {
+            fetch('/api/sheep')
+                .then(r => r.json())
+                .then(animals => {
+                    const selects = [
+                        document.getElementById('health_sheep_id'),
+                        document.getElementById('health_history_id')
+                    ];
+                    const options = animals
+                        .filter(animal => animal.status !== 'ตาย' && animal.status !== 'หาย')
+                        .sort((first, second) => (first.id || '').localeCompare(second.id || ''))
+                        .map(animal => {
+                            const type = animal.animal_type || 'แกะ';
+                            return `<option value="${animal.id}">${animal.id} (${type})</option>`;
+                        })
+                        .join('');
+                    selects.forEach((select, index) => {
+                        if (select) {
+                            const currentValue = select.value;
+                            const allOption = '<option value="all">เลือกทั้งหมด (แกะ/แพะ)</option>';
+                            select.innerHTML = `${allOption}<option value="">เลือกสัตว์</option>${options}`;
+                            select.value = currentValue;
+                        }
+                    });
+                });
+        }
+
+        function setHealthType(type) {
+            document.getElementById('examination-form').style.display = type === 'examination' ? 'block' : 'none';
+            document.getElementById('vaccine-form').style.display = type === 'vaccine' ? 'block' : 'none';
+        }
+
+        async function getHealthTargetIds() {
+            const selectedId = document.getElementById('health_sheep_id').value;
+            if (selectedId !== 'all') return selectedId ? [selectedId] : [];
+            const response = await fetch('/api/sheep');
+            const animals = await response.json();
+            return animals
+                .filter(animal => animal.status !== 'ตาย' && animal.status !== 'หาย')
+                .map(animal => animal.id);
+        }
+
+        async function saveHealthRecords(buildData, resetFields) {
+            try {
+                const targetIds = await getHealthTargetIds();
+                if (!targetIds.length) {
+                    showAlert('health-alert', 'กรุณาเลือกสัตว์ที่ต้องการบันทึก', 'error');
+                    return;
+                }
+                const results = await Promise.all(targetIds.map(sheepId =>
+                    fetch('/api/health/record', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(buildData(sheepId))
+                    }).then(response => response.json())
+                ));
+                const failed = results.find(result => result.status !== 'success');
+                showAlert('health-alert', failed ? failed.message : `บันทึกสุขภาพสำเร็จ ${targetIds.length} ตัว`, failed ? 'error' : 'success');
+                if (!failed) resetFields();
+            } catch (error) {
+                showAlert('health-alert', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            }
+        }
+
+        function recordHealthExamination() {
+            saveHealthRecords(sheepId => ({
+                sheep_id: sheepId,
+                health_type: 'examination',
+                status: document.getElementById('health_status').value,
+                symptoms: document.getElementById('health_symptoms').value,
+                temperature: document.getElementById('health_temp').value,
+                death_date: document.getElementById('health_death_date').value
+            }), () => {
+                document.getElementById('health_sheep_id').value = 'all';
+                document.getElementById('health_status').value = '';
+                document.getElementById('health_symptoms').value = '';
+                document.getElementById('health_temp').value = '';
+                document.getElementById('health_death_date').value = '';
+                document.getElementById('health_death_date_group').style.display = 'none';
+            });
+        }
+
+        function recordVaccine() {
+            saveHealthRecords(sheepId => ({
+                sheep_id: sheepId,
+                health_type: 'vaccine',
+                vaccine_name: document.getElementById('vaccine_name').value,
+                injection_number: document.getElementById('injection_number').value,
+                vaccine_date: document.getElementById('vaccine_date').value,
+                next_dose: document.getElementById('next_vaccine_date').value
+            }), () => {
+                document.getElementById('health_sheep_id').value = 'all';
+                document.getElementById('vaccine_name').value = '';
+                document.getElementById('injection_number').value = '';
+                document.getElementById('vaccine_date').value = '';
+                document.getElementById('next_vaccine_date').value = '';
+            });
+        }
+
+        function loadHealthHistory() {
+            const sheepId = document.getElementById('health_history_id').value;
+            const loadHistory = (animalId) => fetch(`/api/health/${animalId}`)
+                .then(r => r.json())
+                .then(records => records.map((record, recordIndex) => ({ ...record, animalId, recordIndex })));
+            const historyPromise = sheepId === 'all'
+                ? fetch('/api/sheep').then(r => r.json()).then(animals =>
+                    Promise.all(animals.map(animal => loadHistory(animal.id)))
+                        .then(histories => histories.flat())
+                )
+                : loadHistory(sheepId);
+
+            historyPromise.then(data => {
+                    let html = '';
+                    data.forEach(record => {
+                        html += `<div class="card">
+                            <h3>${record.animalId} - ${record.type}</h3>
+                            <p>วันที่: ${record.date}</p>
+                            ${record.type === 'ตรวจสุขภาพ'
+                                ? `<p>สถานะ: ${record.status}</p>
+                                   <p>อาการ: ${record.symptoms}</p>
+                                   <p>อุณหภูมิ: ${record.temperature}°C</p>
+                                   ${record.death_date ? `<p style="color: #ef4444; font-weight: bold;">วันที่(${record.status}): ${record.death_date}</p>` : ''}`
+                                : `<p>วัคซีน: ${record.vaccine_name}</p>
+                                   <p>ครั้งต่อไป: ${record.next_dose_date}</p>`}
+                            <div style="margin-top: 10px;">
+                                <button onclick="openEditHealthModal('${record.animalId}', ${record.recordIndex}, '${record.type}', '${record.status || ''}', '${record.symptoms || ''}', '${record.temperature || ''}', '${record.vaccine_name || ''}', '${record.injection_number || ''}', '${record.date}', '${record.next_dose_date || ''}', '${record.death_date || ''}')" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em;">✏️ แก้ไข</button>
+                                <button onclick="deleteHealth('${record.animalId}', ${record.recordIndex})" style="padding: 5px 10px; background: #dc3545; font-size: 0.9em;">🗑️ ลบ</button>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('health-history').innerHTML = html || '<p>ไม่มีประวัติ</p>';
+                });
+        }
+
+        function toggleHealthDeathDate(status, groupId, inputId) {
+            const deathGroup = document.getElementById(groupId);
+            const labelId = inputId.replace('date', 'date_label');
+            const label = document.getElementById(labelId);
+
+            if (status === 'ตาย' || status === 'หาย') {
+                deathGroup.style.display = 'block';
+                if (label) {
+                    label.textContent = status === 'ตาย' ? 'วันที่ตาย (YYYY-MM-DD)' : 'วันที่หาย (YYYY-MM-DD)';
+                }
+                if (!document.getElementById(inputId).value) {
+                    document.getElementById(inputId).value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                deathGroup.style.display = 'none';
+            }
+        }
+
+        function openEditHealthModal(sheepId, recordIndex, healthType, status, symptoms, temperature, vaccineName, injectionNumber, vaccineDate, nextDoseDate, deathDate = '') {
+            document.getElementById('edit_health_sheep_id').value = sheepId;
+            document.getElementById('edit_health_record_index').value = recordIndex;
+            document.getElementById('edit_health_type').value = healthType;
+
+            if (healthType === 'ตรวจสุขภาพ') {
+                document.getElementById('examination-edit-form').style.display = 'block';
+                document.getElementById('vaccine-edit-form').style.display = 'none';
+                document.getElementById('edit_health_status').value = status;
+                document.getElementById('edit_health_symptoms').value = symptoms;
+                document.getElementById('edit_health_temp').value = temperature;
+                document.getElementById('edit_health_death_date').value = deathDate || '';
+                toggleHealthDeathDate(status, 'edit_health_death_date_group', 'edit_health_death_date');
+            } else {
+                document.getElementById('examination-edit-form').style.display = 'none';
+                document.getElementById('vaccine-edit-form').style.display = 'block';
+                document.getElementById('edit_vaccine_name').value = vaccineName;
+                document.getElementById('edit_injection_number').value = injectionNumber;
+                document.getElementById('edit_vaccine_date').value = vaccineDate;
+                document.getElementById('edit_next_vaccine_date').value = nextDoseDate;
+            }
+
+            document.getElementById('editHealthModal').style.display = 'block';
+        }
+
+        function closeEditHealthModal() {
+            document.getElementById('editHealthModal').style.display = 'none';
+        }
+
+        function editHealth() {
+            const sheepId = document.getElementById('edit_health_sheep_id').value;
+            const recordIndex = document.getElementById('edit_health_record_index').value;
+            const healthType = document.getElementById('edit_health_type').value;
+
+            let data = {
+                sheep_id: sheepId,
+                record_index: recordIndex,
+                health_type: healthType
+            };
+
+            if (healthType === 'ตรวจสุขภาพ') {
+                data.status = document.getElementById('edit_health_status').value;
+                data.symptoms = document.getElementById('edit_health_symptoms').value;
+                data.temperature = document.getElementById('edit_health_temp').value;
+                data.death_date = document.getElementById('edit_health_death_date').value;
+            } else {
+                data.vaccine_name = document.getElementById('edit_vaccine_name').value;
+                data.vaccine_date = document.getElementById('edit_vaccine_date').value;
+                data.next_dose = document.getElementById('edit_next_vaccine_date').value;
+            }
+
+            fetch('/api/health/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('health-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        closeEditHealthModal();
+                        loadHealthHistory();
+                    }
+                });
+        }
+
+        function deleteHealth(sheepId, recordIndex) {
+            if (confirm('คุณแน่ใจหรือที่จะลบประวัติสุขภาพนี้?')) {
+                fetch(`/api/health/delete/${sheepId}/${recordIndex}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        showAlert('health-alert', res.message, res.status);
+                        if (res.status === 'success') {
+                            loadHealthHistory();
+                        }
+                    });
+            }
+        }
+
+        // Breeding functions
+        function planBreeding() {
+            const data = {
+                female_id: document.getElementById('female_id').value,
+                male_id: document.getElementById('male_id').value,
+                breeding_date: document.getElementById('breeding_date').value,
+                expected_date: document.getElementById('expected_date').value
+            };
+
+            fetch('/api/breeding/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('breeding-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        document.getElementById('female_id').value = '';
+                        document.getElementById('male_id').value = '';
+                        document.getElementById('breeding_date').value = '';
+                        document.getElementById('expected_date').value = '';
+                        loadPendingBreeding();
+                    }
+                });
+        }
+
+        function loadPendingBreeding() {
+            fetch('/api/breeding')
+                .then(r => r.json())
+                .then(data => {
+                    let pendingHtml = '';
+                    let completedHtml = '';
+
+                    data.forEach(record => {
+                        let recordCard = '';
+                        if (record.data.status === "คลอดแล้ว") {
+                            let lambsInfo = record.data.lambs.map(l => `${l.id} (${l.gender})`).join(', ');
+                            completedHtml += `<div class="card">
+                                <h3>${record.data.female_id} × ${record.data.male_id} ✓</h3>
+                                <p>วันผสม: ${record.data.breeding_date}</p>
+                                <p>วันคลอด: ${record.data.lambing_date}</p>
+                                <p>ลูกแกะ: ${lambsInfo}</p>
+                                <div style="margin-top: 10px;">
+                                    <button onclick="openEditLambingModal('${record.id}', '${record.data.lambing_date}', '${JSON.stringify(record.data.lambs).replace(/'/g, "&#39;")}')" style="padding: 5px 10px; margin-right: 5px; font-size: 0.9em;">✏️ แก้ไข</button>
+                                    <button onclick="deleteLambing('${record.id}')" style="padding: 5px 10px; background: #dc3545; font-size: 0.9em;">🗑️ ลบ</button>
+                                </div>
+                            </div>`;
+                        } else {
+                            pendingHtml += `<div class="card">
+                                <h3>${record.data.female_id} × ${record.data.male_id}</h3>
+                                <p>วันผสม: ${record.data.breeding_date}</p>
+                                <p>วันคลอดที่คาดหวัง: ${record.data.expected_date}</p>
+                                <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button onclick="showLambingForm('${record.id}')">👶 บันทึกการคลอด</button>
+                                    <button onclick="openEditBreedingPlanModal('${record.id}', '${record.data.female_id}', '${record.data.male_id}', '${record.data.breeding_date}', '${record.data.expected_date}')" style="background: linear-gradient(135deg, #64748b 0%, #475569 100%);">✏️ แก้ไข</button>
+                                    <button onclick="deleteLambing('${record.id}')" style="background: #dc3545;">🗑️ ลบ</button>
+                                </div>
+                            </div>`;
+                        }
+                    });
+
+                    let html = '<h3 style="margin-top: 20px;">⏳ รอติดตาม</h3>' + (pendingHtml || '<p>ไม่มีการผสมพันธุ์ที่รอติดตาม</p>');
+                    html += '<h3 style="margin-top: 30px;">✓ คลอดแล้ว</h3>' + (completedHtml || '<p>ยังไม่มีการคลอด</p>');
+                    document.getElementById('pending-breeding').innerHTML = html;
+                });
+        }
+
+        function openEditBreedingPlanModal(recordId, femaleId, maleId, breedingDate, expectedDate) {
+            document.getElementById('edit_bp_record_id').value = recordId;
+            document.getElementById('edit_bp_female_id').value = femaleId;
+            document.getElementById('edit_bp_male_id').value = maleId;
+            document.getElementById('edit_bp_breeding_date').value = breedingDate;
+            document.getElementById('edit_bp_expected_date').value = expectedDate;
+            document.getElementById('editBreedingPlanModal').style.display = 'block';
+        }
+
+        function closeEditBreedingPlanModal() {
+            document.getElementById('editBreedingPlanModal').style.display = 'none';
+        }
+
+        async function editBreedingPlan() {
+            const data = {
+                record_id: document.getElementById('edit_bp_record_id').value,
+                female_id: document.getElementById('edit_bp_female_id').value,
+                male_id: document.getElementById('edit_bp_male_id').value,
+                breeding_date: document.getElementById('edit_bp_breeding_date').value,
+                expected_date: document.getElementById('edit_bp_expected_date').value
+            };
+
+            try {
+                const res = await fetch('/api/breeding/edit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const resData = await res.json();
+                showAlert('breeding-alert', resData.message, resData.status);
+                if (resData.status === 'success') {
+                    closeEditBreedingPlanModal();
+                    loadPendingBreeding();
+                }
+            } catch (e) {
+                showAlert('breeding-alert', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            }
+        }
+
+        function openEditLambingModal(recordId, lambingDate, lambsJson) {
+            document.getElementById('edit_lambing_id').value = recordId;
+            document.getElementById('edit_lambing_date').value = lambingDate;
+
+            // Parse lambs JSON
+            let lambs = JSON.parse(lambsJson);
+            let lambsHtml = '';
+            lambs.forEach((lamb, index) => {
+                lambsHtml += `<div class="card" style="background: #f0f8ff; margin: 10px 0;">
+                    <h4>ลูกแกะที่ ${index + 1}</h4>
+                    <div class="form-group">
+                        <label>รหัส ID</label>
+                        <input type="text" id="edit_lamb_id_${index}" value="${lamb.id}">
+                    </div>
+                    <div class="form-group">
+                        <label>เพศ</label>
+                        <select id="edit_lamb_gender_${index}">
+                            <option value="ตัวผู้" ${lamb.gender === 'ตัวผู้' ? 'selected' : ''}>ตัวผู้</option>
+                            <option value="ตัวเมีย" ${lamb.gender === 'ตัวเมีย' ? 'selected' : ''}>ตัวเมีย</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>น้ำหนัก (กก.)</label>
+                        <input type="number" id="edit_lamb_weight_${index}" value="${lamb.weight}" step="0.1">
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('edit_lambs_list').innerHTML = lambsHtml;
+            document.getElementById('editLambingModal').style.display = 'block';
+        }
+
+        function closeEditLambingModal() {
+            document.getElementById('editLambingModal').style.display = 'none';
+        }
+
+        function editLambing() {
+            const recordId = document.getElementById('edit_lambing_id').value;
+            const lambingDate = document.getElementById('edit_lambing_date').value;
+
+            // Collect lamb data
+            let lambs = [];
+            let lambInputs = document.querySelectorAll('[id^="edit_lamb_id_"]');
+            lambInputs.forEach((_, index) => {
+                lambs.push({
+                    id: document.getElementById(`edit_lamb_id_${index}`).value,
+                    gender: document.getElementById(`edit_lamb_gender_${index}`).value,
+                    weight: document.getElementById(`edit_lamb_weight_${index}`).value
+                });
+            });
+
+            const data = {
+                record_id: recordId,
+                lambing_date: lambingDate,
+                lambs: lambs
+            };
+
+            fetch('/api/lambing/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('breeding-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        closeEditLambingModal();
+                        loadPendingBreeding();
+                    }
+                });
+        }
+
+        function deleteLambing(recordId) {
+            if (confirm('คุณแน่ใจหรือที่จะลบบันทึกการคลอดนี้?')) {
+                fetch(`/api/lambing/delete/${recordId}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        showAlert('breeding-alert', res.message, res.status);
+                        if (res.status === 'success') {
+                            loadPendingBreeding();
+                        }
+                    });
+            }
+        }
+
+        // Feed Stock functions
+        function addFeedStock() {
+            const data = {
+                feed_type: document.getElementById('new_feed_type').value,
+                quantity: document.getElementById('new_feed_qty').value,
+                min_level: document.getElementById('new_feed_min').value
+            };
+
+            fetch('/api/feed-stock/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('feedstock-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        document.getElementById('new_feed_type').value = '';
+                        document.getElementById('new_feed_qty').value = '';
+                        document.getElementById('new_feed_min').value = '';
+                        loadFeedStock();
+                    }
+                });
+        }
+
+        function loadFeedStock() {
+            fetch('/api/feed-stock')
+                .then(r => r.json())
+                .then(data => {
+                    let html = '';
+                    let selectHtml = '<option value="">เลือก</option>';
+                    Object.entries(data).forEach(([type, info]) => {
+                        const status = parseFloat(info.quantity) <= parseFloat(info.min_level) ? '⚠️ น้อย' : '✅ เพียงพอ';
+                        html += `<div class="card">
+                            <h3>${type}</h3>
+                            <p>ปริมาณ: ${info.quantity} ${info.unit}</p>
+                            <p>ระดับขั้นต่ำ: ${info.min_level} ${info.unit}</p>
+                            <p>สถานะ: ${status}</p>
+                        </div>`;
+                        selectHtml += `<option value="${type}">${type}</option>`;
+                    });
+                    document.getElementById('feed-stock-list').innerHTML = html || '<p>ยังไม่มีข้อมูลคลังอาหาร</p>';
+                    document.getElementById('update_feed_type').innerHTML = selectHtml;
+                });
+        }
+
+        function updateFeedStock() {
+            const data = {
+                feed_type: document.getElementById('update_feed_type').value,
+                operation: document.getElementById('update_operation').value,
+                quantity: document.getElementById('update_qty').value
+            };
+
+            fetch('/api/feed-stock/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showAlert('feedstock-alert', res.message, res.status);
+                    if (res.status === 'success') {
+                        loadFeedStock();
+                    }
+                });
+        }
+
+        // Report
+        async function generateReport() {
+            const response = await fetch('/api/report');
+            const data = await response.json();
+                    let html = `
+                        <h3>📊 สรุปรายงานฟาร์ม</h3>
+                        <div class="stats">
+                            <div class="stat-card">
+                                <h3>${data.total_sheep}</h3>
+                                <p>แกะทั้งหมด</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.total_goats || 0}</h3>
+                                <p>แพะทั้งหมด</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.male_sheep}/${data.female_sheep}</h3>
+                                <p>ตัวผู้/ตัวเมีย</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.male_goats || 0}/${data.female_goats || 0}</h3>
+                                <p>แพะตัวผู้/ตัวเมีย</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.healthy}/${data.sick}</h3>
+                                <p>ปกติ/ป่วย</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.dead}/${data.missing}</h3>
+                                <p>สัตว์ตาย/หาย</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.total_lambs}</h3>
+                                <p>ลูกแกะที่เกิด</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>${data.vaccines || 0}</h3>
+                                <p>รายการวัคซีน</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>💉 รายการวัคซีน</h3>
+                            ${(data.vaccine_records || []).length
+                                ? `<div class="table-responsive"><table>
+                                    <tr><th>รหัสสัตว์</th><th>ชนิด</th><th>วัคซีน</th><th>เข็มที่</th><th>วันที่ฉีด</th><th>ครั้งถัดไป</th></tr>
+                                    ${data.vaccine_records.map(record => `<tr><td>${record.animal_id}</td><td>${record.animal_type}</td><td>${record.vaccine_name}</td><td>${record.injection_number}</td><td>${record.date}</td><td>${record.next_dose_date}</td></tr>`).join('')}
+                                </table></div>`
+                                : '<p>ยังไม่มีรายการวัคซีน</p>'}
+                        </div>
+                        <div class="card">
+                            <h3>👶 การผสมพันธุ์</h3>
+                            <p>จำนวนครั้ง: ${data.total_breeding}</p>
+                            <p>สำเร็จแล้ว: ${data.successful_breeding}</p>
+                        </div>
+                        <div class="card">
+                            <h3>💰 สรุปรายงาน</h3>
+                            <p>การให้อาหาร: ${data.feeding_records} ครั้ง</p>
+                            <p>ตรวจสุขภาพ: ${data.health_exams} ครั้ง</p>
+                            <p>ฉีดวัคซีน: ${data.vaccines} ครั้ง</p>
+                        </div>
+                        <p style="color: #666; margin-top: 20px;">สร้าง: ${data.date}</p>
+                    `;
+            document.getElementById('report-content').innerHTML = html;
+            return data;
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            window.location.href = '/api/report/export-pdf';
+        }
+
+        async function printReport() {
+            try {
+                await generateReport();
+                window.print();
+            } catch (error) {
+                showAlert('report-content', 'ไม่สามารถโหลดรายงานเพื่อพิมพ์ได้', 'error');
+            }
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            window.location.href = '/api/report/export-excel';
+        }
+
+        // Initialize
+        window.onload = function () {
+            setHealthType('examination');
+            loadDashboard();
+
+            // Add click listener to close menu on mobile when an item is clicked
+            const menuItems = document.querySelectorAll('.sidebar .menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const sidebar = document.querySelector('.sidebar');
+                    const overlay = document.querySelector('.mobile-overlay');
+                    if (sidebar && sidebar.classList.contains('mobile-active')) {
+                        sidebar.classList.remove('mobile-active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        };
+
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            if (sidebar) {
+                sidebar.classList.toggle('mobile-active');
+            }
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+        }
+    </script>
+</body>
+
+</html>

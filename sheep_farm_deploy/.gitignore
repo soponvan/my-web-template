@@ -1,0 +1,22 @@
+# Python Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments & Virtualenv
+.venv/
+venv/
+ENV/
+env/
+
+# IDE / Editor Settings
+.vscode/
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Database / Local Log Files (หากต้องการแยกข้อมูลเครื่อง Local)
+*.sqlite3
+*.log
