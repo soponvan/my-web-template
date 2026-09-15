@@ -14,6 +14,12 @@ import threading
 from datetime import datetime
 from pathlib import Path
 from io import BytesIO
+try:
+    import psycopg2
+    from psycopg2.extras import Json
+except ImportError:
+    psycopg2 = None
+    Json = None
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -40,6 +46,7 @@ HEALTH_FILE = DATA_DIR / "health_records.json"
 BREEDING_FILE = DATA_DIR / "breeding_records.json"
 FEED_STOCK_FILE = DATA_DIR / "feed_stock.json"
 USERS_FILE = DATA_DIR / "users.json"
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # ระบบสิทธิ์: admin และ user ทั่วไป
 ROLE_PERMISSIONS = {
@@ -82,10 +89,28 @@ class SheepFarmManager:
     def __init__(self):
         self._save_lock = threading.RLock()
         self.create_data_directory()
+        if DATABASE_URL:
+            self.initialize_database()
         self.load_all_data()
     
     def create_data_directory(self):
         DATA_DIR.mkdir(exist_ok=True)
+
+    def get_database_connection(self):
+        if psycopg2 is None:
+            raise RuntimeError('DATABASE_URL requires psycopg2-binary to be installed')
+        return psycopg2.connect(DATABASE_URL)
+
+    def initialize_database(self):
+        with self.get_database_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS farm_data (
+                        data_key TEXT PRIMARY KEY,
+                        data JSONB NOT NULL,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                ''')
     
     def load_all_data(self):
         self.sheep_records = self.load_json(SHEEP_FILE)
@@ -95,6 +120,24 @@ class SheepFarmManager:
         self.feed_stock = self.load_json(FEED_STOCK_FILE)
     
     def load_json(self, filepath):
+        if DATABASE_URL:
+            with self.get_database_connection() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute('SELECT data FROM farm_data WHERE data_key = %s', (filepath.name,))
+                    row = cursor.fetchone()
+                    if row:
+                        return row[0]
+
+            if filepath.exists():
+                data = self.load_local_json(filepath)
+                if data:
+                    self.save_json(filepath, data)
+                return data
+            return {}
+
+        return self.load_local_json(filepath)
+
+    def load_local_json(self, filepath):
         if filepath.exists():
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
@@ -104,6 +147,19 @@ class SheepFarmManager:
         return {}
     
     def save_json(self, filepath, data):
+        if DATABASE_URL:
+            with self._save_lock:
+                with self.get_database_connection() as connection:
+                    with connection.cursor() as cursor:
+                        cursor.execute('''
+                            INSERT INTO farm_data (data_key, data, updated_at)
+                            VALUES (%s, %s, NOW())
+                            ON CONFLICT (data_key) DO UPDATE SET
+                                data = EXCLUDED.data,
+                                updated_at = NOW()
+                        ''', (filepath.name, Json(data)))
+            return
+
         filepath.parent.mkdir(parents=True, exist_ok=True)
         temp_path = None
         with self._save_lock:
