@@ -9,6 +9,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import os
 import secrets
+import tempfile
+import threading
 from datetime import datetime
 from pathlib import Path
 from io import BytesIO
@@ -78,6 +80,7 @@ def permission_required(permission):
 
 class SheepFarmManager:
     def __init__(self):
+        self._save_lock = threading.RLock()
         self.create_data_directory()
         self.load_all_data()
     
@@ -101,8 +104,22 @@ class SheepFarmManager:
         return {}
     
     def save_json(self, filepath, data):
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = None
+        with self._save_lock:
+            try:
+                with tempfile.NamedTemporaryFile(
+                    mode='w', encoding='utf-8', dir=filepath.parent,
+                    prefix=f'.{filepath.name}.', suffix='.tmp', delete=False
+                ) as temp_file:
+                    temp_path = Path(temp_file.name)
+                    json.dump(data, temp_file, ensure_ascii=False, indent=2)
+                    temp_file.flush()
+                    os.fsync(temp_file.fileno())
+                os.replace(temp_path, filepath)
+            finally:
+                if temp_path and temp_path.exists():
+                    temp_path.unlink()
     
     def register_sheep(self, sheep_id, gender, dob, breed, weight, animal_type='แกะ', tag_color='-'):
         if sheep_id in self.sheep_records:
@@ -194,7 +211,7 @@ class SheepFarmManager:
             "notes": notes
         }
         
-        record_id = f"feeding_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        record_id = f"feeding_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}_{secrets.token_hex(4)}"
         self.feeding_records[record_id] = feeding_record
         
         self.save_json(FEEDING_FILE, self.feeding_records)
@@ -332,7 +349,7 @@ class SheepFarmManager:
             "lambs": []
         }
         
-        record_id = f"breeding_{female_id}_{datetime.now().strftime('%Y%m%d')}"
+        record_id = f"breeding_{female_id}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}_{secrets.token_hex(4)}"
         self.breeding_records[record_id] = breeding_record
         
         self.save_json(BREEDING_FILE, self.breeding_records)
