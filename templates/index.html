@@ -900,6 +900,8 @@
                 <div class="menu-item admin-only" id="menu-users" onclick="showSection('users')"
                     style="display:none; border-top: 1px solid rgba(99,102,241,0.2); margin-top: 8px; padding-top: 12px;">
                     👥 จัดการผู้ใช้</div>
+                <div class="menu-item admin-only" id="menu-database" onclick="showSection('database')"
+                    style="display:none;">💾 สำรอง/นำเข้าข้อมูล</div>
             </div>
             <div class="content">
                 <div id="dashboard" class="section active">
@@ -1466,6 +1468,30 @@
                     <div id="users-list" class="table-responsive"></div>
                 </div>
 
+                <div id="database" class="section">
+                    <h2>💾 สำรองและนำเข้าข้อมูล</h2>
+                    <div id="database-alert"></div>
+                    <div style="padding: 20px; margin-bottom: 24px; border: 1px solid rgba(253,215,113,0.35); border-radius: 14px; background: rgba(253,215,113,0.08); color: #f8fafc; line-height: 1.8;">
+                        <strong style="color: #FDD771;">สำคัญ:</strong>
+                        ไฟล์สำรองมีข้อมูลฟาร์มแกะ/แพะ การให้อาหาร สุขภาพ/วัคซีน การผสมพันธุ์ และคลังอาหาร
+                        เก็บไฟล์ไว้ในที่ปลอดภัย และอย่าเผยแพร่ให้บุคคลอื่น
+                        <br>
+                        การนำเข้าจะแทนที่ข้อมูลฟาร์มทั้ง 5 หมวดในระบบปัจจุบัน
+                        <strong>ไม่รวมบัญชีผู้ใช้และรหัสผ่าน</strong>
+                    </div>
+
+                    <h3>ส่งออกไฟล์สำรอง</h3>
+                    <p style="color: #e7e5e4; margin-bottom: 14px;">ดาวน์โหลดข้อมูลปัจจุบันเป็นไฟล์ JSON ที่นำกลับมาใช้ในหน้านี้ได้</p>
+                    <button type="button" onclick="exportDatabaseBackup()" style="background-color: #10b981;">⬇️ ดาวน์โหลดไฟล์สำรอง</button>
+
+                    <h3 style="margin-top: 36px;">นำเข้าจากไฟล์สำรอง</h3>
+                    <div class="form-group">
+                        <label for="database-backup-file">เลือกไฟล์สำรอง (.json)</label>
+                        <input type="file" id="database-backup-file" accept=".json,application/json">
+                    </div>
+                    <button type="button" onclick="importDatabaseBackup()" style="background-color: #dc2626;">⚠️ นำเข้าและแทนที่ข้อมูลปัจจุบัน</button>
+                </div>
+
                 <!-- Change Password Modal -->
                 <div id="changePasswordModal"
                     style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);">
@@ -1556,6 +1582,7 @@
                     // Show admin menu
                     if (data.user.role === 'admin') {
                         document.getElementById('menu-users').style.display = 'flex';
+                        document.getElementById('menu-database').style.display = 'flex';
                     }
                     // ผู้ใช้ทั่วไปไม่มีสิทธิ์จัดการผู้ใช้งานระบบ
                     if (data.user.role === 'user') {
@@ -1811,6 +1838,60 @@
             const alertDiv = document.getElementById(elementId);
             alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
             setTimeout(() => alertDiv.innerHTML = '', 5000);
+        }
+
+        async function exportDatabaseBackup() {
+            try {
+                const response = await fetch('/api/admin/database/export');
+                if (!response.ok) {
+                    const result = await response.json();
+                    throw new Error(result.message || 'ดาวน์โหลดไฟล์สำรองไม่สำเร็จ');
+                }
+                const blob = await response.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const disposition = response.headers.get('Content-Disposition') || '';
+                const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || 'sheep_farm_backup.json';
+                link.href = downloadUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+                showAlert('database-alert', 'ดาวน์โหลดไฟล์สำรองเรียบร้อยแล้ว', 'success');
+            } catch (error) {
+                showAlert('database-alert', error.message || 'ดาวน์โหลดไฟล์สำรองไม่สำเร็จ', 'error');
+            }
+        }
+
+        async function importDatabaseBackup() {
+            const fileInput = document.getElementById('database-backup-file');
+            const file = fileInput.files[0];
+            if (!file) {
+                showAlert('database-alert', 'กรุณาเลือกไฟล์สำรอง JSON ก่อน', 'error');
+                return;
+            }
+            if (!confirm(`ยืนยันนำเข้าไฟล์ "${file.name}"?\nข้อมูลฟาร์มทั้ง 5 หมวดปัจจุบันจะถูกแทนที่ ไม่สามารถย้อนกลับได้หากไม่มีไฟล์สำรอง`)) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('backup_file', file);
+            try {
+                const response = await fetch('/api/admin/database/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (!response.ok || result.status !== 'success') {
+                    throw new Error(result.message || 'นำเข้าไฟล์สำรองไม่สำเร็จ');
+                }
+                fileInput.value = '';
+                showAlert('database-alert', result.message, 'success');
+                setTimeout(() => window.location.reload(), 1200);
+            } catch (error) {
+                showAlert('database-alert', error.message || 'นำเข้าไฟล์สำรองไม่สำเร็จ', 'error');
+            }
         }
 
         // Dashboard

@@ -35,6 +35,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # ไฟล์เก็บข้อมูล
@@ -47,6 +48,14 @@ BREEDING_FILE = DATA_DIR / "breeding_records.json"
 FEED_STOCK_FILE = DATA_DIR / "feed_stock.json"
 USERS_FILE = DATA_DIR / "users.json"
 DATABASE_URL = os.environ.get('DATABASE_URL')
+BACKUP_FORMAT = 'sheep-farm-management-backup'
+FARM_DATA_FILES = {
+    'sheep_records': SHEEP_FILE,
+    'feeding_records': FEEDING_FILE,
+    'health_records': HEALTH_FILE,
+    'breeding_records': BREEDING_FILE,
+    'feed_stock': FEED_STOCK_FILE,
+}
 
 # ระบบสิทธิ์: admin และ user ทั่วไป
 ROLE_PERMISSIONS = {
@@ -176,6 +185,101 @@ class SheepFarmManager:
             finally:
                 if temp_path and temp_path.exists():
                     temp_path.unlink()
+
+    def export_data(self):
+        with self._save_lock:
+            return {
+                key: json.loads(json.dumps(getattr(self, key), ensure_ascii=False, allow_nan=False))
+                for key in FARM_DATA_FILES
+            }
+
+    def replace_all_data(self, data):
+        if not isinstance(data, dict) or set(data) != set(FARM_DATA_FILES):
+            raise ValueError('ไฟล์สำรองต้องมีข้อมูลครบทั้ง 5 หมวดและไม่มีหมวดที่ไม่รู้จัก')
+        for key, value in data.items():
+            if not isinstance(value, dict):
+                raise ValueError(f'ข้อมูลหมวด {key} ต้องเป็น JSON object')
+            if not all(isinstance(item_key, str) for item_key in value):
+                raise ValueError(f'คีย์ข้อมูลหมวด {key} ต้องเป็นข้อความ')
+            if key in ('sheep_records', 'feeding_records', 'breeding_records', 'feed_stock'):
+                if not all(isinstance(item, dict) for item in value.values()):
+                    raise ValueError(f'ข้อมูลภายในหมวด {key} มีรูปแบบไม่ถูกต้อง')
+            elif not all(
+                isinstance(records, list)
+                and all(isinstance(record, dict) for record in records)
+                for records in value.values()
+            ):
+                raise ValueError('ข้อมูลภายในหมวด health_records มีรูปแบบไม่ถูกต้อง')
+
+        serialized = {
+            key: json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False)
+            for key, value in data.items()
+        }
+        replacement = json.loads(json.dumps(data, ensure_ascii=False, allow_nan=False))
+
+        with self._save_lock:
+            if DATABASE_URL:
+                with self.get_database_connection() as connection:
+                    with connection.cursor() as cursor:
+                        for key, filepath in FARM_DATA_FILES.items():
+                            cursor.execute('''
+                                INSERT INTO farm_data (data_key, data, updated_at)
+                                VALUES (%s, %s, NOW())
+                                ON CONFLICT (data_key) DO UPDATE SET
+                                    data = EXCLUDED.data,
+                                    updated_at = NOW()
+                            ''', (filepath.name, Json(replacement[key])))
+            else:
+                previous_files = {
+                    filepath: filepath.read_bytes() if filepath.exists() else None
+                    for filepath in FARM_DATA_FILES.values()
+                }
+                temporary_files = {}
+                replaced_files = []
+                try:
+                    for key, filepath in FARM_DATA_FILES.items():
+                        filepath.parent.mkdir(parents=True, exist_ok=True)
+                        with tempfile.NamedTemporaryFile(
+                            mode='w', encoding='utf-8', dir=filepath.parent,
+                            prefix=f'.{filepath.name}.', suffix='.tmp', delete=False
+                        ) as temp_file:
+                            temp_file.write(serialized[key])
+                            temp_file.flush()
+                            os.fsync(temp_file.fileno())
+                            temporary_files[filepath] = Path(temp_file.name)
+
+                    for filepath, temp_path in temporary_files.items():
+                        os.replace(temp_path, filepath)
+                        replaced_files.append(filepath)
+                except Exception as error:
+                    rollback_errors = []
+                    for filepath in reversed(replaced_files):
+                        previous_data = previous_files[filepath]
+                        try:
+                            if previous_data is None:
+                                filepath.unlink(missing_ok=True)
+                            else:
+                                with tempfile.NamedTemporaryFile(
+                                    mode='wb', dir=filepath.parent,
+                                    prefix=f'.{filepath.name}.', suffix='.rollback',
+                                    delete=False
+                                ) as rollback_file:
+                                    rollback_file.write(previous_data)
+                                    rollback_file.flush()
+                                    os.fsync(rollback_file.fileno())
+                                    rollback_path = Path(rollback_file.name)
+                                os.replace(rollback_path, filepath)
+                        except OSError as rollback_error:
+                            rollback_errors.append(rollback_error)
+                    if rollback_errors:
+                        raise RuntimeError('นำเข้าข้อมูลไม่สำเร็จและกู้คืนไฟล์เดิมได้ไม่ครบ') from error
+                    raise
+                finally:
+                    for temp_path in temporary_files.values():
+                        temp_path.unlink(missing_ok=True)
+
+            for key in FARM_DATA_FILES:
+                setattr(self, key, replacement[key])
     
     def register_sheep(self, sheep_id, gender, dob, breed, weight, animal_type='แกะ', tag_color='-'):
         if sheep_id in self.sheep_records:
@@ -1315,6 +1419,68 @@ def update_user():
 def delete_user(username):
     result = user_manager.delete_user(username, session['user_id'])
     return jsonify(result)
+
+@app.route('/api/admin/database/export', methods=['GET'])
+@admin_required
+def export_database_backup():
+    backup = {
+        'format': BACKUP_FORMAT,
+        'version': 1,
+        'exported_at': datetime.now().astimezone().isoformat(),
+        'data': manager.export_data(),
+    }
+    backup_buffer = BytesIO(json.dumps(
+        backup, ensure_ascii=False, indent=2, allow_nan=False
+    ).encode('utf-8'))
+    response = send_file(
+        backup_buffer,
+        mimetype='application/json',
+        as_attachment=True,
+        download_name=f'sheep_farm_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+    )
+    response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+@app.route('/api/admin/database/import', methods=['POST'])
+@admin_required
+def import_database_backup():
+    backup_file = request.files.get('backup_file')
+    if backup_file is None or not backup_file.filename:
+        return jsonify({'status': 'error', 'message': 'กรุณาเลือกไฟล์สำรองข้อมูล JSON'}), 400
+
+    try:
+        backup = json.loads(backup_file.read())
+    except (json.JSONDecodeError, UnicodeDecodeError, RecursionError):
+        return jsonify({'status': 'error', 'message': 'ไฟล์ไม่ใช่ JSON ที่ถูกต้องหรือมีโครงสร้างลึกเกินไป'}), 400
+
+    if not isinstance(backup, dict):
+        return jsonify({'status': 'error', 'message': 'รูปแบบไฟล์สำรองไม่ถูกต้อง'}), 400
+    if backup.get('format') != BACKUP_FORMAT or type(backup.get('version')) is not int or backup['version'] != 1:
+        return jsonify({'status': 'error', 'message': 'ไม่รองรับรูปแบบหรือเวอร์ชันไฟล์สำรองนี้'}), 400
+
+    try:
+        manager.replace_all_data(backup.get('data'))
+    except ValueError as error:
+        return jsonify({'status': 'error', 'message': str(error)}), 400
+    except Exception:
+        app.logger.exception('Database backup import failed')
+        return jsonify({
+            'status': 'error',
+            'message': 'นำเข้าข้อมูลไม่สำเร็จ ระบบพยายามคงข้อมูลเดิมไว้แล้ว'
+        }), 500
+
+    return jsonify({
+        'status': 'success',
+        'message': 'นำเข้าข้อมูลสำรองสำเร็จ',
+        'imported_categories': list(FARM_DATA_FILES),
+    })
+
+@app.errorhandler(413)
+def request_entity_too_large(_error):
+    return jsonify({
+        'status': 'error',
+        'message': 'ไฟล์สำรองมีขนาดเกิน 10 MB'
+    }), 413
 
 @app.route('/api/sheep', methods=['GET'])
 @login_required
